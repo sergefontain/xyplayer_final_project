@@ -93,7 +93,7 @@ const GetStarted: React.FC<Props> = ({ createPlaylist }) => {
                         htmlFor="namePlaylist"
                         className="col-3 col-sm-3 col-md-2 col-form-label forFormLabel d-flex justify-content-end"
                       >
-                        Call'im
+                        Name it!
                       </label>
                       <input
                         className="form-control "
@@ -115,7 +115,7 @@ const GetStarted: React.FC<Props> = ({ createPlaylist }) => {
                         htmlFor="descPlaylist"
                         className="col-3 col-sm-3 col-md-2 col-form-label forFormLabel d-flex justify-content-end"
                       >
-                        Describe'im
+                        Describe it!
                       </label>
                       <input
                         className="form-control col-xs-9"
