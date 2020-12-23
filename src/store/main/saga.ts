@@ -490,6 +490,24 @@ export function* deleteTrackSaga(): SagaIterator {
       )
       yield put(actions.getTracksOk(modifiedPlaylist))
       yield put(actions.deleteTrackSuccess())
+      yield put(actions.getPlaylistsReq())
+      yield put(actions.setPageLimit(PAGE_LIMIT))
+      const limitedPlaylists = yield call(
+        myFetch,
+        queryPlaylists,
+        {
+          query: JSON.stringify([
+            {},
+            {
+              // sort: [{ _id: -1 }],
+              // skip: [10],
+              limit: [PAGE_LIMIT],
+            },
+          ]),
+        },
+        { headers: { Authorization: `Bearer ${authData}` } }
+      )
+      yield put(actions.getPlaylistsOk(limitedPlaylists))
     } catch (e) {
       yield put(actions.deleteTrackFailure())
       throw new Error(`delete track rejected: ${e}`)
