@@ -39,6 +39,35 @@ const infoPreparingToServer = (arr: Array<any>) => {
   return arr
 }
 
+const infoPreparingToReUpload = (arr: Array<any>) => {
+  for (let obj of arr) {
+    for (let key in obj) {
+      if (key === "originalFileName") {
+        delete obj[key]
+      }
+      if (key === "url") {
+        delete obj[key]
+      }
+      if (key === "id3") {
+        delete obj[key]
+      }
+    }
+  }
+  return arr
+}
+
+const preparingTracksArrToDeleteOne = (
+  trackIdToDelete: string,
+  tracksArr: Array<any>
+) => {
+  const index = tracksArr.findIndex((x) => x._id === trackIdToDelete)
+  if (index !== -1) {
+    tracksArr.splice(index, 1)
+  }
+
+  return tracksArr
+}
+
 const PAGE_LIMIT = 20
 
 const queryPlaylists = `
@@ -111,6 +140,17 @@ mutation addPlaylist($playlist: PlaylistInput!){
   PlaylistUpsert(playlist: $playlist){
     name
     description
+    tracks{
+      _id
+    }
+  }
+}
+`
+
+const deleteTrack = `
+mutation deleteTrack($playlist: PlaylistInput!){
+  PlaylistUpsert(playlist: $playlist){
+    _id
     tracks{
       _id
     }
@@ -376,9 +416,83 @@ export function* createPlaylistSaga(): SagaIterator {
       )
       yield put(actions.createPlaylistSuccess())
       yield put(actions.getPlaylistsReq())
+      yield put(actions.setPageLimit(PAGE_LIMIT))
+      const limitedPlaylists = yield call(
+        myFetch,
+        queryPlaylists,
+        {
+          query: JSON.stringify([
+            {},
+            {
+              // sort: [{ _id: -1 }],
+              // skip: [10],
+              limit: [PAGE_LIMIT],
+            },
+          ]),
+        },
+        { headers: { Authorization: `Bearer ${authData}` } }
+      )
+      yield put(actions.getPlaylistsOk(limitedPlaylists))
     } catch (e) {
       yield put(actions.createPlaylistFailure(e))
       throw new Error(`Playlist creation rejected: ${e}`)
+    }
+  }
+}
+
+export function* deleteTrackSaga(): SagaIterator {
+  while (true) {
+    try {
+      const { payload: trackIdToDelete } = yield take(actions.deleteTrackReq)
+      const authData = yield call(getToken)
+      const playlistId = yield call(getPlaylistId)
+      const searchQuery = `${playlistId}`
+      const playlistOne = yield call(
+        myFetch,
+        queryPlaylistOne,
+        {
+          query: JSON.stringify([
+            {
+              _id: searchQuery,
+            },
+          ]),
+        },
+        { headers: { Authorization: `Bearer ${authData}` } }
+      )
+      const res = yield call(
+        preparingTracksArrToDeleteOne,
+        trackIdToDelete,
+        playlistOne.PlaylistFindOne.tracks
+      )
+      const TracksArrIdToReupload = yield call(infoPreparingToReUpload, res)
+      const yes = yield call(
+        myFetch,
+        deleteTrack,
+        {
+          playlist: { _id: playlistId, tracks: TracksArrIdToReupload },
+        },
+        { headers: { Authorization: `Bearer ${authData}` } }
+      )
+      console.log(yes)
+
+      const searchQuery2 = `${yes.PlaylistUpsert._id}`
+      const modifiedPlaylist = yield call(
+        myFetch,
+        queryPlaylistOne,
+        {
+          query: JSON.stringify([
+            {
+              _id: searchQuery2,
+            },
+          ]),
+        },
+        { headers: { Authorization: `Bearer ${authData}` } }
+      )
+      yield put(actions.getTracksOk(modifiedPlaylist))
+      yield put(actions.deleteTrackSuccess())
+    } catch (e) {
+      yield put(actions.deleteTrackFailure())
+      throw new Error(`delete track rejected: ${e}`)
     }
   }
 }

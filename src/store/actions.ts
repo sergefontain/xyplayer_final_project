@@ -60,3 +60,12 @@ export const createPlaylistSuccess = createAction(
 export const createPlaylistFailure = createAction(
   "main/PLAYLIST_CREATION_FAILURE"
 )<string>()
+
+
+export const deleteTrackReq = createAction("main/DELETE_TRACK")<string>()
+export const deleteTrackSuccess = createAction(
+  "main/DELETE_TRACK_SUCCEED"
+)()
+export const deleteTrackFailure = createAction(
+  "main/DELETE_TRACK_FAILURE"
+)()

@@ -38,6 +38,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
       getTracks: actions.getTracksReq,
       prevPlaylistPage: actions.prevPlaylistPage,
       nextPlaylistPage: actions.nextPlaylistPage,
+      deleteTrack: actions.deleteTrackReq,
     },
     dispatch
   )
@@ -51,6 +52,7 @@ const GetPlaylists: React.FC<Props> = ({
   nextPlaylistPage,
   currentPlaylistPage,
   pageLimitOverload,
+  deleteTrack,
 }) => {
   const [showButton, setShowButton] = useState(true)
   const [showMessage, setShowMessage] = useState("")
@@ -130,7 +132,10 @@ const GetPlaylists: React.FC<Props> = ({
                 <Row key={i.toString()} className="mappedSong flex-column">
                   {showButton && (
                     <Col onClick={() => setShowMessage(x._id)} className="">
-                      {x.originalFileName}
+                      <div>{x.originalFileName}</div>
+                      <a href="#!" onClick={() => deleteTrack(x._id)}>
+                        cancel track
+                      </a>
                     </Col>
                   )}
 
@@ -202,7 +207,10 @@ const GetPlaylists: React.FC<Props> = ({
                 <Row key={i.toString()} className="mappedSong flex-column">
                   {showButton && (
                     <Col onClick={() => setShowMessage(x._id)} className="">
-                      {x.originalFileName}
+                      <div>{x.originalFileName}</div>
+                      <a href="#!" onClick={() => deleteTrack(x._id)}>
+                        cancel track
+                      </a>
                     </Col>
                   )}
 

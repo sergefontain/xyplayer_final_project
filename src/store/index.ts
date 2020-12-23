@@ -8,6 +8,7 @@ import {
   getPlaylistsSaga,
   getTracksSaga,
   createPlaylistSaga,
+  deleteTrackSaga,
 } from "./main/saga"
 
 import rootReducer from "./rootReducer"
@@ -21,6 +22,7 @@ function* rootSaga() {
     spawn(getPrevPlaylistPageSaga),
     spawn(getNextPlaylistPageSaga),
     spawn(createPlaylistSaga),
+    spawn(deleteTrackSaga),
   ])
 }
 

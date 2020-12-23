@@ -65,4 +65,6 @@ export interface MainState {
   formData: Object
   creationStatus: boolean
   preCreateError: string
+  deleteTrackError: string
+  deleteTrackStatus: string
 }

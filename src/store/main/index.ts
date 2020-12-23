@@ -13,6 +13,8 @@ const initialState: MainState = {
   formData: {},
   creationStatus: false,
   preCreateError: "",
+  deleteTrackError: "",
+  deleteTrackStatus: "",
 }
 
 const mainReducer = (
@@ -65,13 +67,13 @@ const mainReducer = (
         ...state,
         pageLimitOverload: action.payload,
       }
-      case getType(actions.createPlaylistSuccess):
+    case getType(actions.createPlaylistSuccess):
       return {
         ...state,
         creationStatus: true,
         preCreateError: "",
       }
-      case getType(actions.createPlaylistFailure):
+    case getType(actions.createPlaylistFailure):
       return {
         ...state,
         creationStatus: false,
@@ -81,6 +83,16 @@ const mainReducer = (
       return {
         ...state,
         formData: action.payload,
+      }
+    case getType(actions.deleteTrackSuccess):
+      return {
+        ...state,
+        deleteTrackStatus: "ok",
+      }
+    case getType(actions.deleteTrackFailure):
+      return {
+        ...state,
+        deleteTrackError: "fail",
       }
     default:
       return state
