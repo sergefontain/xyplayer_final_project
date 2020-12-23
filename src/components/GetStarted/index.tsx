@@ -1,71 +1,175 @@
-import React, { useState } from "react"
-import { Container, Button, Alert } from "react-bootstrap"
-import { CSSTransition } from "react-transition-group"
-import "./styles.css"
+import React, { FormEvent, useState } from "react"
+import { Container, Button, Col, Row } from "react-bootstrap"
 
-import Player from "../AudioPlayer"
-import song01 from "./01.mp3"
-import song02 from "./02.mp3"
-import song03 from "./03.mp3"
+import { RootAction } from "../../store/rootReducer"
+import * as actions from "./../../store/actions"
 
-const arrToMap = [song01, song02, song03]
+import GetPlaylists from "../GetPlaylists"
+import { connect } from "react-redux"
+import { bindActionCreators, Dispatch } from "redux"
 
-const GetStarted = () => {
-  const [showButton, setShowButton] = useState(true)
-  const [showMessage, setShowMessage] = useState(false)
-  const ref: any = React.useRef()
+// import { v4 as uuidv4 } from "uuid"
 
+const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
+  bindActionCreators(
+    {
+      preCreatePlaylist: actions.preCreatePlaylist,
+      createPlaylist: actions.createPlaylistReq,
+    },
+    dispatch
+  )
 
+type Props = ReturnType<typeof mapDispatchToProps>
 
-  // let filteredArr = arrToMap.filter((x, index, arr) => {
-  //   if (index > arr.length - index) {
-  //     arr.slice(index)
-  //     console.log(arr)
-  //   }
-  // })
-  // console.log(filteredArr) setShowMessage(true)
+const GetStarted: React.FC<Props> = ({ createPlaylist }) => {
+  const [namePlaylist, setNamePlaylist] = useState("")
+  const [descPlaylist, setDescPlaylist] = useState("")
+  const labelVal: React.RefObject<HTMLDivElement> = React.useRef(null)
+  const inputFile: React.RefObject<HTMLInputElement> = React.useRef(null)
+
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    createPlaylist({
+      name: namePlaylist,
+      description: descPlaylist,
+      files: Array.from(e.target[2].files),
+    })
+  }
+
+  React.useEffect(() => {
+    const jsMessage = labelVal!.current
+    const tracksInput = inputFile!.current
+
+    const handler = (e: Event) => {
+      let countFiles: string = ""
+      let labelMes = jsMessage!.innerText
+      const files = Array.from(e.target!.files)
+      if (files && files.length >= 1) {
+        countFiles = `${files.length}`
+      }
+      if (countFiles) {
+        jsMessage!.innerText = "Files chosen: " + countFiles
+      } else {
+        jsMessage!.innerText = labelMes
+      }
+    }
+    if (tracksInput) {
+      tracksInput!.addEventListener("change", handler)
+      return () => tracksInput!.removeEventListener("change", handler)
+    }
+  }, [])
 
   return (
-    <main id="login">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col" ref={ref}>
-            {arrToMap.map((x, index, arr) => {
-              return (
-                <div className="row" key={index.toString()}>
-                  {showButton && <Button onClick={() => setShowMessage(true)} size="lg">Show Message</Button>}
-                  <CSSTransition
-                    in={showMessage}
-                    timeout={300}
-                    classNames="alert"
-                    unmountOnExit
-                    onEnter={() => setShowButton(false)}
-                    onExited={() => setShowButton(true)}
-                  >
-                    <Alert
-                      variant="primary"
-                      dismissible
-                      onClose={() => setShowMessage(false)}
+    <main id="getStarted" className="d-flex">
+      <Container fluid className="flex-grow-1 d-flex flex-column">
+        <GetPlaylists />
+
+        <Row>
+          <Col className="plyCol">
+            <form
+              encType="multipart/form-data"
+              method="post"
+              action=""
+              onSubmit={submitHandler}
+            >
+              <Row>
+                <Col className="my-3 forForm d-flex justify-content-center">
+                  <p className="py-1 px-3 bg-warning rounded text-truncate bd-highlight">
+                    Say something 'bout your playlist!
+                  </p>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="">
+                  <Row>
+                    <Col
+                      sm={12}
+                      md={12}
+                      lg={6}
+                      xl={6}
+                      className="d-flex flex-row"
                     >
-                      <Alert.Heading>Animated alert message</Alert.Heading>
-                      <p>
-                        This alert message is being transitioned in and out of
-                        the DOM.
-                      </p>
-                      <Player src={x} />
-                      <Button onClick={() => setShowMessage(false)}>
-                        Close
-                      </Button>
-                    </Alert>
-                  </CSSTransition>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+                      <label
+                        htmlFor="namePlaylist"
+                        className="col-3 col-sm-3 col-md-2 col-form-label forFormLabel d-flex justify-content-end"
+                      >
+                        Call'im
+                      </label>
+                      <input
+                        className="form-control "
+                        value={namePlaylist}
+                        name="namePlaylist"
+                        id="namePlaylist"
+                        type="text"
+                        onChange={(e) => setNamePlaylist(e.target.value)}
+                      />
+                    </Col>
+                    <Col
+                      sm={12}
+                      md={12}
+                      lg={6}
+                      xl={6}
+                      className="d-flex flex-row"
+                    >
+                      <label
+                        htmlFor="descPlaylist"
+                        className="col-3 col-sm-3 col-md-2 col-form-label forFormLabel d-flex justify-content-end"
+                      >
+                        Describe'im
+                      </label>
+                      <input
+                        className="form-control col-xs-9"
+                        value={descPlaylist}
+                        id="descPlaylist"
+                        name="descPlaylist"
+                        type="text"
+                        onChange={(e) => setDescPlaylist(e.target.value)}
+                      />
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <div className="field__wrapper">
+                    <input
+                      ref={inputFile}
+                      name="audioFile"
+                      type="file"
+                      accept="audio/*"
+                      id="audioFile"
+                      className="field field__file"
+                      multiple
+                    />
+
+                    <label className="field__file-wrapper" htmlFor="audioFile">
+                      <div
+                        ref={labelVal}
+                        className="field__file-fake"
+                        style={{ lineHeight: "16px" }}
+                      >
+                        File do not chosen
+                      </div>
+                      <div className="field__file-button">Attach Files</div>
+                    </label>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex justify-content-center">
+                  <div>
+                    <Button type="submit" className="px-5 mb-3 forForm">
+                      Send
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+            </form>
+          </Col>
+        </Row>
+      </Container>
     </main>
   )
 }
 
-export default React.memo(GetStarted)
+export default connect(null, mapDispatchToProps)(React.memo(GetStarted))

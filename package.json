@@ -2,10 +2,12 @@
   "name": "xyplayer",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://player.asmer.fs.a-level.com.ua",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@types/form-data": "^2.5.0",
     "@types/jest": "^26.0.15",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.53",
@@ -13,14 +15,19 @@
     "@types/uuid": "^8.3.0",
     "bootstrap": "^4.5.3",
     "canvas": "^2.6.1",
+    "graphql": "^15.4.0",
+    "graphql-request": "^3.4.0",
+    "graphql-tag": "^2.11.0",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
+    "react-double-marquee": "^1.0.6",
+    "react-dropzone": "^11.2.4",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
-    "react-transition-group": "^4.4.1",
     "redux": "^4.0.5",
+    "redux-saga": "^1.1.3",
     "typesafe-actions": "^5.1.0",
     "uuid": "^8.3.2",
     "web-vitals": "^0.2.4"
@@ -51,6 +58,7 @@
   },
   "devDependencies": {
     "@types/react-redux": "^7.1.11",
-    "typescript": "^4.2.0-dev.20201210"
+    "react-transition-group": "^4.4.1",
+    "typescript": "^4.2.0-dev.20201219"
   }
 }

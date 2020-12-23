@@ -6,4 +6,6 @@ export type AuthAction = ActionType<typeof actions>
 export interface AuthState {
   isLogon: boolean
   authStatus: string
+  error: string
+  token: string
 }

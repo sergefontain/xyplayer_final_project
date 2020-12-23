@@ -1,38 +1,693 @@
-.App {
-  text-align: center;
+@font-face {
+  font-family: "FREESCPT";
+  src: url("./fontStyles/Freescpt/FREESCPT.eot");
+  src: url("./fontStyles/Freescpt/FREESCPT.eot") format("embedded-opentype"),
+    url("./fontStyles/Freescpt/FREESCPT.woff2") format("woff2"),
+    url("./fontStyles/Freescpt/FREESCPT.woff") format("woff"),
+    url("./fontStyles/Freescpt/FREESCPT.ttf") format("truetype"),
+    url("./fontStyles/Freescpt/FREESCPT.svg#FREESCPT") format("svg");
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.slogan {
+  font-size: 31px;
+  font-family: "freescpt";
+  letter-spacing: 5px;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+main {
+  background: darkslategray;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.forForm {
+  font-family: "century gothic";
+  font-size: 20px;
+}
+.forFormLabel {
+  font-family: "century gothic";
+  font-size: 16px;
+}
+
+.mappedPlaylist {
+  margin-bottom: 2px;
+  font-size: 20px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-family: "monospace";
+  padding-left: 20px;
+  font-weight: 600;
+  color: rgb(255, 251, 0);
+  background: rgb(251, 251, 249);
+  background: linear-gradient(
+    0deg,
+    rgb(250, 250, 154) 0%,
+    rgba(55, 209, 166, 1) 10%,
+    rgba(93, 214, 209, 1) 47%,
+    rgba(32, 138, 189, 1) 77%,
+    rgba(96, 120, 226, 1) 100%
+  );
+}
+
+.mappedPlaylist:hover {
+  font-size: 20px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-family: "monospace";
+  padding-left: 20px;
+  font-weight: 600;
+  color: rgb(255, 251, 0);
+  background: rgb(251, 251, 249);
+  background: linear-gradient(
+    -90deg,
+    rgb(250, 250, 154) 0%,
+    rgba(55, 209, 166, 1) 40%,
+    rgba(93, 214, 209, 1) 67%,
+    rgb(189, 32, 176) 87%,
+    rgb(200, 96, 226) 100%
+  );
+}
+
+.mappedSong {
+  padding-left: 20px;
+  color: blue;
+  background: rgb(251, 251, 249);
+  background: linear-gradient(
+    180deg,
+    rgba(251, 251, 249, 1) 0%,
+    rgba(160, 209, 55, 1) 19%,
+    rgba(121, 214, 93, 1) 50%,
+    rgba(32, 189, 61, 1) 80%,
+    rgba(0, 157, 44, 1) 100%
+  );
+}
+
+.mappedSong:hover {
+  padding-left: 20px;
+  color: blue;
+  background: rgb(131, 58, 180);
+  background: linear-gradient(
+    -90deg,
+    rgba(131, 58, 180, 1) 0%,
+    rgba(253, 29, 29, 1) 50%,
+    rgba(252, 176, 69, 1) 100%
+  );
+}
+
+#footer {
+  height: 5vh;
+  background: teal;
+}
+
+.field__wrapper {
+  width: 100%;
+  position: relative;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.field__file {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+}
+
+.field__file-wrapper {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.field__file-fake {
+  height: 40px;
+  width: calc(100% - 130px);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 15px;
+  border: 1px solid #424141;
+  border-radius: 3px 0 0 3px;
+  border-right: none;
+}
+
+.field__file-button {
+  width: 130px;
+  height: 40px;
+  background: #1bbc9b;
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+}
+
+.forPlaylists {
+  font-family: monospace;
+  font-size: 20px;
+  height: min-content;
+}
+.playCont {
+  background-color: white;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  justify-content: center;
+}
+
+.plyCol {
+  background: lightgrey;
+}
+
+input[type="range"] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type="range"]:focus {
+  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+input[type="range"]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #68d6f8, 0px 0px 1px #68d6f8;
+  background: #a8b0b6;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+input[type="range"]:focus::-webkit-slider-runnable-track {
+  background: #367ebd;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 2.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #68d6f8, 0px 0px 1px #68d6f8;
+  background: #9bb0c2;
+  border-radius: 1.3px;
+  border: 0.2px solid #a9c3e0;
+}
+
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 2.4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+  background: #aabcca;
+  border: 0.2px solid #010101;
+  border-radius: 1.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type="range"]:focus::-ms-fill-lower {
+  background: #a6b6c5;
+}
+input[type="range"]::-ms-fill-upper {
+  background: #a4b0b9;
+  border: 0.2px solid #010101;
+  border-radius: 1.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type="range"]:focus::-ms-fill-upper {
+  background: #a7bcce;
+}
+
+.text-outline-blue {
+  text-shadow: -0 -1px 0 #1904f9;
+}
+.text-outline-orange {
+  text-shadow: 1px -1px 2px #f98704;
+}
+.text-outline-green {
+  text-shadow: 1px -1px 2px #119600;
+}
+.text-outline-grey {
+  text-shadow: 1px -1px 2px #525252;
+}
+
+.timeScreen {
+  background: rgb(252, 209, 114);
+  background: rgb(252, 209, 114);
+  background: linear-gradient(
+    0deg,
+    rgba(160, 202, 148, 0.8329177057356608) 0%,
+    rgba(160, 202, 148, 1) 10%,
+    rgba(34, 193, 195, 1) 50%,
+    rgba(174, 221, 161, 0.805) 88%,
+    rgba(190, 202, 148, 0.805) 100%
+  );
+}
+
+.titleTimeScreen {
+  color: white;
+  background: rgb(255, 5, 17);
+}
+.additionalScreen {
+  background: rgb(230, 227, 40);
+  background: linear-gradient(
+    0deg,
+    rgba(160, 202, 148, 0.8054862842892768) 0%,
+    rgba(174, 221, 161, 0.805) 10%,
+    rgb(214, 206, 89) 50%,
+    rgba(174, 221, 161, 0.805) 88%,
+    rgba(160, 202, 148, 0.8054862842892768) 100%
+  );
+}
+
+.additionalTitle {
+  color: white;
+  background: rgb(2, 173, 31);
+}
+
+.timeLineTitle {
+  color: white;
+  background: rgb(255, 187, 0);
+}
+
+.trackControlPanel {
+  border: 1px solid rgb(82, 82, 82);
+  box-shadow: 2px 3px 10px #777272;
+}
+
+/* font-sizes */
+.fsm {
+  font-size: 1em !important;
+}
+.fsmd {
+  font-size: 1.5em !important;
+}
+.fs2m {
+  font-size: 2em !important;
+}
+.fs2md {
+  font-size: 2.5em !important;
+}
+.fs3m {
+  font-size: 3em !important;
+}
+.fs4m {
+  font-size: 4em !important;
+}
+.fs5m {
+  font-size: 5em !important;
+}
+.fsrm {
+  font-size: 1rem !important;
+}
+.fsrmd {
+  font-size: 1.5rem !important;
+}
+.fs2rm {
+  font-size: 2rem !important;
+}
+.fs2rmd {
+  font-size: 2.5rem !important;
+}
+.fs3rm {
+  font-size: 3rem !important;
+}
+.fs4rm {
+  font-size: 4rem !important;
+}
+.fs5rm {
+  font-size: 5rem !important;
+}
+
+body {
+  margin: 0 auto;
+  min-width: 320px;
+  width: 100%;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+cite,
+a,
+ul,
+li,
+form,
+fieldset,
+select,
+input,
+option,
+button,
+legend {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  list-style: none;
+  text-decoration: none;
+  text-transform: none;
+  font-style: normal;
+  color: inherit;
+}
+
+#header a {
+  color: white;
+}
+
+#header a:hover {
+  color: rgb(91, 108, 235);
+}
+#header a:active {
+  color: rgb(241, 245, 4);
+}
+#wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.container {
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
+  height: auto;
+}
+#header {
+  position: relative;
+  z-index: 2;
+  background: black;
+}
+#header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-nav {
+  margin: 0 17px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555555;
+}
+#menu__toggle {
+  opacity: 0;
+  position: absolute;
+}
+.menu__btn {
+  align-items: center;
+  position: absolute;
+  top: 37px;
+  right: 40px;
+  width: 30px;
+  height: 26px;
+  cursor: pointer;
+  z-index: 1;
+  display: none;
+}
+.menu__btn > span,
+.menu__btn > span::before,
+.menu__btn > span::after {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background-color: #616161;
+}
+.menu__btn > span::before {
+  content: "";
+  top: -12px;
+}
+.menu__btn > span::after {
+  content: "";
+  top: 12px;
+}
+.menu__box {
+  display: flex;
+  list-style: none;
+}
+.menu__box > li:not(:first-child) {
+  padding: 0 0 0 28px;
+}
+.menu__box .active a {
+  color: rgb(117, 130, 226);
+}
+.menu__box .active a:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 30px;
+  height: 1px;
+  left: 50%;
+  bottom: -3px;
+  transform: translateX(-15px);
+  color: rgb(117, 130, 226);
+}
+.menu__box > li a:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 0;
+  height: 1px;
+  background-color: rgb(117, 130, 226);
+  left: 50%;
+  bottom: -3px;
+  transition: all 0.3s ease;
+}
+.menu__box > li a:hover {
+  color: rgb(117, 130, 226);
+}
+.menu__box > li a:hover:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: rgb(117, 130, 226);
+  left: 50%;
+  bottom: -3px;
+  transform: translateX(-50%);
+}
+.menu__box > li a {
+  position: relative;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  color: black;
+}
+main {
+  flex-grow: 1;
+}
+
+@media (max-width: 991px) {
+  .main-nav {
+    margin: 0 15px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .menu__box .active a:after {
+    bottom: -3px;
+  }
+}
+
+@media (max-width: 767px) {
+  #header a {
+    color: grey;
+  }
+  #header a:active {
+    color: rgb(7, 221, 71);
+  }
+  .menu__btn {
+    display: flex;
+  }
+  .menu-holder {
+    visibility: visible;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    display: flex;
+    background: aliceblue;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1.6s ease-in-out;
+  }
+  .menu-holder > .menu__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .menu-holder > .menu__box ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .menu-holder > .menu__box > li:not(:last-child) {
+    padding: 13px 0 3px 0;
+  }
+  .menu-holder > .menu__box > li:last-child {
+    padding: 13px 0 25px 0;
+  }
+  #menu__toggle:checked ~ .menu-holder {
+    max-height: 400px;
+    visibility: visible;
+    display: flex;
+    justify-content: center;
+  }
+  #menu__toggle:checked ~ .menu-holder .menu__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #menu__toggle:checked ~ .menu-holder .menu__box ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #menu__toggle:checked ~ .menu-holder .menu__box > li:not(:last-child) {
+    padding: 13px 0 3px 0;
+  }
+  #menu__toggle:checked ~ .menu-holder .menu__box > li:last-child {
+    padding: 13px 0 25px 0;
+  }
+  #menu__toggle ~ .menu__btn > span {
+    transform: rotate(0);
+    transition: ease 0.5s all;
+  }
+  #menu__toggle ~ .menu__btn > span::before {
+    top: -12px;
+    transform: rotate(0);
+    transition: ease 0.5s all;
+    width: 100%;
+  }
+  #menu__toggle ~ .menu__btn > span::after {
+    top: 11px;
+    transform: rotate(0);
+    transition: ease 0.5s all;
+    width: 100%;
+  }
+  #menu__toggle ~ .menu__btn:hover > span {
+    animation: light-blue 2.4s linear infinite;
+  }
+  #menu__toggle ~ .menu__btn:hover > span::before {
+    animation: light-blue 2.4s linear infinite;
+  }
+  #menu__toggle ~ .menu__btn:hover > span::after {
+    animation: light-blue 2.4s linear infinite;
+  }
+  #menu__toggle:checked ~ .menu__btn > span {
+    transform: rotate(90deg);
+    transition: ease 0.5s all;
+    animation: light-pink 2s ease-in infinite;
+  }
+  #menu__toggle:checked ~ .menu__btn > span::before {
+    top: 7px;
+    left: 45%;
+    transform: rotate(135deg);
+    transition: ease 0.5s all;
+    width: 60%;
+    animation: light-pink 2s ease-in infinite;
+  }
+  #menu__toggle:checked ~ .menu__btn > span::after {
+    top: -7px;
+    transform: rotate(45deg);
+    transition: ease 0.5s all;
+    left: 43%;
+    width: 60%;
+    animation: light-pink 2s ease-in infinite;
+  }
+}
+
+@keyframes light-blue {
+  0% {
+    background-color: rgb(7, 221, 71);
+    box-shadow: 0px 0px 3px rgb(94, 248, 153), 0px 0px 5px rgb(33, 145, 70),
+      0px 0px 7px rgb(0, 255, 55);
+  }
+  25% {
+    background-color: rgb(7, 221, 71);
+    box-shadow: 0px 0px 4px rgb(94, 248, 153);
+  }
+  50% {
+    background-color: rgb(7, 221, 71);
+    box-shadow: 0px 0px 3px rgb(94, 248, 153), 0px 0px 5px rgb(33, 145, 70),
+      0px 0px 7px rgb(0, 255, 55);
+  }
+  75% {
+    background-color: rgb(7, 221, 71);
+    box-shadow: 0px 0px 4px rgb(94, 248, 153);
+  }
+  100% {
+    background-color: rgb(7, 221, 71);
+    box-shadow: 0px 0px 3px rgb(94, 248, 153), 0px 0px 5px rgb(33, 145, 70),
+      0px 0px 7px rgb(0, 255, 55);
+  }
+}
+@keyframes light-pink {
+  0% {
+    background-color: rgb(250, 160, 76);
+    box-shadow: 0px 0px 6px rgb(255, 255, 255), 0px 0px 8px rgb(255, 217, 0),
+      0px 0px 12px rgb(255, 66, 66);
+  }
+  25% {
+    background-color: rgb(253, 86, 44);
+    box-shadow: 0px 0px 6px rgb(255, 255, 255), 0px 0px 8px rgb(255, 217, 0),
+      0px 0px 12px rgb(255, 66, 66);
+  }
+  50% {
+    background-color: rgb(255, 1, 1);
+    box-shadow: 0px 0px 6px rgb(255, 255, 255), 0px 0px 8px rgb(255, 217, 0),
+      0px 0px 12px rgb(255, 66, 66);
+  }
+  75% {
+    background-color: rgb(253, 86, 44);
+    box-shadow: 0px 0px 6px rgb(255, 255, 255), 0px 0px 8px rgb(255, 217, 0),
+      0px 0px 12px rgb(255, 66, 66);
+  }
+  100% {
+    background-color: rgb(250, 160, 76);
+    box-shadow: 0px 0px 6px rgb(255, 255, 255), 0px 0px 8px rgb(255, 217, 0),
+      0px 0px 12px rgb(255, 66, 66);
   }
 }

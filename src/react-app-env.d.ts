@@ -8,3 +8,10 @@ interface RefObject<T> {
   // immutable
   readonly current: T | null
 }
+
+declare module 'react-double-marquee'
+
+// declare let FormData: {
+//   prototype: FormData;
+//   new (form?: HTMLFormElement): FormData;
+// };
