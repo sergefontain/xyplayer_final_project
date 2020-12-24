@@ -32,6 +32,7 @@ const GetStarted: React.FC<Props> = ({ createPlaylist }) => {
     createPlaylist({
       name: namePlaylist,
       description: descPlaylist,
+      // @ts-ignore
       files: Array.from(e.target[2].files),
     })
   }
@@ -43,6 +44,7 @@ const GetStarted: React.FC<Props> = ({ createPlaylist }) => {
     const handler = (e: Event) => {
       let countFiles: string = ""
       let labelMes = jsMessage!.innerText
+      // @ts-ignore
       const files = Array.from(e.target!.files)
       if (files && files.length >= 1) {
         countFiles = `${files.length}`

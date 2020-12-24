@@ -186,7 +186,7 @@ class Music extends React.PureComponent<Props, State> {
         }
       }
     }
-
+    // @ts-ignore
     this.rotator!.onmousewheel = (e: WheelEvent) => {
       let x = rotValue + (e.deltaY / 100) * rotStep // деление на 100, чтобы исключить фактор влияния deltaY на шаг изменения угла, сделать зависимым шаг исключительно от величины step
 

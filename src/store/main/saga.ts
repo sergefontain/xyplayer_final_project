@@ -3,12 +3,25 @@ import { call, put, take } from "redux-saga/effects"
 import * as actions from "../actions"
 import { myFetch } from "../apiClient"
 import { ENDPOINT_UPLOAD } from "./../../store/apiClient"
+import jwt_decode from "jwt-decode"
+
+interface User {
+  acl: Array<any>
+  id: string
+  login: string
+}
+
+interface UserInfo {
+  iat: number
+  sub: User
+}
 
 const getToken = () => localStorage.getItem("token")
 const getPlaylistId = () => localStorage.getItem("playlistId")
 const getTracksTrueStatus = () => localStorage.getItem("setTracksTrue")
 const getPlaylistPageLength = () => localStorage.getItem("playlistPageLength")
 const checkLimitOverLoad = () => localStorage.getItem("limitOverloaded")
+// const getPlaylistOwnerId = () => localStorage.getItem("ownerId")
 
 const allTracks = async (acceptedFiles: Array<any>) => {
   return await Promise.all(
@@ -75,6 +88,9 @@ query findPlaylists($query: String!){
     PlaylistFind(query:$query){
     name
     _id
+    owner{
+      _id
+    }
     tracks{
       _id
       originalFileName
@@ -118,6 +134,9 @@ query playlistOne($query: String!){
   PlaylistFindOne(query: $query){
     _id
     name
+    owner{
+      _id
+    }
     tracks{
       _id
       originalFileName
@@ -151,6 +170,9 @@ const deleteTrack = `
 mutation deleteTrack($playlist: PlaylistInput!){
   PlaylistUpsert(playlist: $playlist){
     _id
+    owner{
+      _id
+    }
     tracks{
       _id
     }
@@ -164,6 +186,7 @@ export function* getPlaylistsSaga(): SagaIterator {
     try {
       yield take(actions.authSuccess)
       const authData = yield call(getToken)
+      
       yield put(actions.getPlaylistsReq())
       console.log("getPlaylistsReq()")
       const allPlaylists = yield call(
@@ -172,7 +195,6 @@ export function* getPlaylistsSaga(): SagaIterator {
         {},
         { headers: { Authorization: `Bearer ${authData}` } }
       )
-
       yield put(actions.setPlaylistPageLength(allPlaylists.PlaylistFind.length))
       localStorage.setItem(
         "playlistPageLength",
@@ -186,7 +208,7 @@ export function* getPlaylistsSaga(): SagaIterator {
           query: JSON.stringify([
             {},
             {
-              // sort: [{ _id: -1 }],
+              sort: [{ _id: -1 }],
               // skip: [10],
               limit: [PAGE_LIMIT],
             },
@@ -228,6 +250,11 @@ export function* getTracksSaga(): SagaIterator {
           },
           { headers: { Authorization: `Bearer ${authData}` } }
         )
+        yield put(
+          actions.getPlaylistOwnerId(playlistOne.PlaylistFindOne.owner._id)
+        )
+        const decoded: UserInfo = jwt_decode(authData)
+        yield put(actions.getUserId(decoded.sub.id))
         yield put(actions.getTracksOk(playlistOne))
         continue
       }
@@ -265,19 +292,23 @@ export function* getTracksSaga(): SagaIterator {
           query: JSON.stringify([
             {},
             {
+              sort: [{ _id: -1 }],
               limit: [PAGE_LIMIT],
             },
           ]),
         },
         { headers: { Authorization: `Bearer ${authData}` } }
       )
+      console.log(tracks)
       console.log("начат блок кода, когда нету playlistIdOld")
       yield put(actions.getTracksOk(tracks))
 
       // загрузка треков по запросу
       console.log("ожидание загрузки треков по запросу")
       const { payload: playlistId } = yield take(actions.getTracksReq)
+
       localStorage.setItem("playlistId", playlistId)
+
       yield put(actions.getTracksReq(""))
       const searchQuery = `${playlistId}`
       const playlistOne = yield call(
@@ -321,7 +352,7 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
           query: JSON.stringify([
             {},
             {
-              // sort: [{ _id: -1 }],
+              sort: [{ _id: -1 }],
               skip: [prevPlaylistQuery],
               limit: [PAGE_LIMIT],
             },
@@ -368,7 +399,7 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
           query: JSON.stringify([
             {},
             {
-              // sort: [{ _id: -1 }],
+              sort: [{ _id: -1 }],
               skip: [nextPlaylistQuery],
               limit: [PAGE_LIMIT],
             },
@@ -424,8 +455,7 @@ export function* createPlaylistSaga(): SagaIterator {
           query: JSON.stringify([
             {},
             {
-              // sort: [{ _id: -1 }],
-              // skip: [10],
+              sort: [{ _id: -1 }],
               limit: [PAGE_LIMIT],
             },
           ]),
@@ -445,6 +475,7 @@ export function* deleteTrackSaga(): SagaIterator {
     try {
       const { payload: trackIdToDelete } = yield take(actions.deleteTrackReq)
       const authData = yield call(getToken)
+
       const playlistId = yield call(getPlaylistId)
       const searchQuery = `${playlistId}`
       const playlistOne = yield call(
@@ -464,6 +495,7 @@ export function* deleteTrackSaga(): SagaIterator {
         trackIdToDelete,
         playlistOne.PlaylistFindOne.tracks
       )
+
       const TracksArrIdToReupload = yield call(infoPreparingToReUpload, res)
       const yes = yield call(
         myFetch,
@@ -473,8 +505,6 @@ export function* deleteTrackSaga(): SagaIterator {
         },
         { headers: { Authorization: `Bearer ${authData}` } }
       )
-      console.log(yes)
-
       const searchQuery2 = `${yes.PlaylistUpsert._id}`
       const modifiedPlaylist = yield call(
         myFetch,
@@ -490,24 +520,6 @@ export function* deleteTrackSaga(): SagaIterator {
       )
       yield put(actions.getTracksOk(modifiedPlaylist))
       yield put(actions.deleteTrackSuccess())
-      yield put(actions.getPlaylistsReq())
-      yield put(actions.setPageLimit(PAGE_LIMIT))
-      const limitedPlaylists = yield call(
-        myFetch,
-        queryPlaylists,
-        {
-          query: JSON.stringify([
-            {},
-            {
-              // sort: [{ _id: -1 }],
-              // skip: [10],
-              limit: [PAGE_LIMIT],
-            },
-          ]),
-        },
-        { headers: { Authorization: `Bearer ${authData}` } }
-      )
-      yield put(actions.getPlaylistsOk(limitedPlaylists))
     } catch (e) {
       yield put(actions.deleteTrackFailure())
       throw new Error(`delete track rejected: ${e}`)

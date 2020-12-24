@@ -67,4 +67,6 @@ export interface MainState {
   preCreateError: string
   deleteTrackError: string
   deleteTrackStatus: string
+  playlistOwnerId: string
+  userId: string
 }

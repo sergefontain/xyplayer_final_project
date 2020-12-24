@@ -69,3 +69,5 @@ export const deleteTrackSuccess = createAction(
 export const deleteTrackFailure = createAction(
   "main/DELETE_TRACK_FAILURE"
 )()
+export const getPlaylistOwnerId = createAction("main/GET_PLAYLIST_OWNER_ID")<string>()
+export const getUserId = createAction("main/GET_USER_ID")<string>()

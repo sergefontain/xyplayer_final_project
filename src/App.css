@@ -15,6 +15,14 @@
   color: white;
 }
 
+.deleteTrackPointer:hover {
+  cursor: pointer;
+}
+
+.deletePoiner:hover {
+  color: red;
+}
+
 main {
   background: darkslategray;
 }

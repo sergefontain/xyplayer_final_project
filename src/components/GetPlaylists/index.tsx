@@ -19,6 +19,8 @@ interface PlaylistResolver {
 interface TrackResolver {
   queryStatus: string
   tracksFromRedux: TracksFind | null
+  userId: string
+  ownerId: string
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -30,6 +32,8 @@ const mapStateToProps = (state: RootState) => ({
   tracksFromRedux: state.main.tracks,
   currentPlaylistPage: state.main.currentPlaylistPage,
   pageLimitOverload: state.main.pageLimitOverload,
+  ownerId: state.main.playlistOwnerId,
+  userId: state.main.userId,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
@@ -53,6 +57,8 @@ const GetPlaylists: React.FC<Props> = ({
   currentPlaylistPage,
   pageLimitOverload,
   deleteTrack,
+  ownerId,
+  userId,
 }) => {
   const [showButton, setShowButton] = useState(true)
   const [showMessage, setShowMessage] = useState("")
@@ -107,7 +113,12 @@ const GetPlaylists: React.FC<Props> = ({
     }
   }
 
-  const MapTracksQuery = ({ queryStatus, tracksFromRedux }: TrackResolver) => {
+  const MapTracksQuery = ({
+    queryStatus,
+    tracksFromRedux,
+    userId,
+    ownerId,
+  }: TrackResolver) => {
     if (
       queryStatus === "playlists_succeed" ||
       queryStatus === "idle" ||
@@ -127,15 +138,25 @@ const GetPlaylists: React.FC<Props> = ({
         )
         return (
           <Container fluid className="flex-grow-1 d-flex flex-column">
-            {filteredPlaylist.map((x, i) => {
+            {filteredPlaylist.map((x, i, arr) => {
               return (
                 <Row key={i.toString()} className="mappedSong flex-column">
                   {showButton && (
-                    <Col onClick={() => setShowMessage(x._id)} className="">
+                    <Col
+                      onClick={() => setShowMessage(x._id)}
+                      className="d-flex flex-row justify-content-between align-items-center"
+                    >
                       <div>{x.originalFileName}</div>
-                      <a href="#!" onClick={() => deleteTrack(x._id)}>
-                        cancel track
-                      </a>
+                      {ownerId === userId ? (
+                        <div
+                          onClick={() => deleteTrack(x._id)}
+                          className="deleteTrackPointer pb-1"
+                        >
+                          <span aria-hidden="true" className="deletePoiner">
+                            ×
+                          </span>
+                        </div>
+                      ) : null}
                     </Col>
                   )}
 
@@ -208,9 +229,6 @@ const GetPlaylists: React.FC<Props> = ({
                   {showButton && (
                     <Col onClick={() => setShowMessage(x._id)} className="">
                       <div>{x.originalFileName}</div>
-                      <a href="#!" onClick={() => deleteTrack(x._id)}>
-                        cancel track
-                      </a>
                     </Col>
                   )}
 
@@ -341,6 +359,8 @@ const GetPlaylists: React.FC<Props> = ({
             <MapTracksQuery
               queryStatus={queryStatus}
               tracksFromRedux={tracksFromRedux}
+              ownerId={ownerId}
+              userId={userId}
             />
           </div>
         </Col>

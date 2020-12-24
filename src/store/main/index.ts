@@ -15,6 +15,8 @@ const initialState: MainState = {
   preCreateError: "",
   deleteTrackError: "",
   deleteTrackStatus: "",
+  playlistOwnerId: "",
+  userId: "",
 }
 
 const mainReducer = (
@@ -22,6 +24,16 @@ const mainReducer = (
   action: MainAction
 ): MainState => {
   switch (action.type) {
+    case getType(actions.getUserId):
+      return {
+        ...state,
+        userId: action.payload,
+      }
+    case getType(actions.getPlaylistOwnerId):
+      return {
+        ...state,
+        playlistOwnerId: action.payload,
+      }
     case getType(actions.getPlaylistsReq):
       return {
         ...state,
