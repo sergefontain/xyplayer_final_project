@@ -307,43 +307,53 @@ const GetPlaylists: React.FC<Props> = ({
       </Row>
 
       <Row className="flex-grow-1 flex-column">
-        <Col className="d-flex flex-row">
-          <Col className="d-flex justify-content-start">
+        <Col className="d-flex flex-row align-items-center">
+          <Col
+            className="d-flex justify-content-start"
+            style={{ height: "min-content" }}
+          >
             {+currentPlaylistPage === 1 ? (
               <Button
                 disabled
                 onClick={() => prevPlaylistPage(`${+currentPlaylistPage - 1}`)}
+                className="arrow-right"
               >
-                Prev
+                <div className="icon-arrow-left">&#xea38;</div>
               </Button>
             ) : (
               <Button
                 onClick={() => prevPlaylistPage(`${+currentPlaylistPage - 1}`)}
               >
-                Prev
+                <div className="icon-arrow-left">&#xea38;</div>
               </Button>
             )}
           </Col>
-          <div className="plyCol flex-grow-1 w-100">
+          <div
+            className="plyCol flex-grow-1 w-100"
+            style={{ height: "min-content" }}
+          >
             <MapPlaylistsQuery
               queryStatus={queryStatus}
               getTracks={getTracks}
               playlistsFromRedux={playlistsFromRedux}
             />
           </div>
-          <Col className="d-flex justify-content-end">
+          <Col
+            className="d-flex justify-content-end"
+            style={{ height: "min-content" }}
+          >
             {+currentPlaylistPage > 0 && !pageLimitOverload ? (
               <Button
                 onClick={() => nextPlaylistPage(`${+currentPlaylistPage + 1}`)}
               >
-                Next
+                <div className="icon-arrow-right">&#xea34;</div>
               </Button>
             ) : (
               <Button
                 disabled
                 onClick={() => nextPlaylistPage(`${+currentPlaylistPage + 1}`)}
               >
-                Next
+                <div className="icon-arrow-right">&#xea34;</div>
               </Button>
             )}
           </Col>

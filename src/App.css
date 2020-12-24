@@ -8,6 +8,33 @@
     url("./fontStyles/Freescpt/FREESCPT.svg#FREESCPT") format("svg");
 }
 
+@font-face {
+  font-family: 'icomoon';
+  src:  url('./fontStyles/arrows/icomoon.eot?wqea');
+  src:  url('./fontStyles/arrows/icomoon.eot?wqea#iefix') format('embedded-opentype'),
+    url('./fontStyles/arrows/icomoon.ttf?wqea') format('truetype'),
+    url('./fontStyles/arrows/icomoon.woff?wqea') format('woff'),
+    url('./fontStyles/arrows/icomoon.svg?wqea#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+[class^="icon-"],
+[class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "icomoon" !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
 .slogan {
   font-size: 31px;
   font-family: "freescpt";

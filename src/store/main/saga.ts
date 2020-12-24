@@ -5,6 +5,8 @@ import { myFetch } from "../apiClient"
 import { ENDPOINT_UPLOAD } from "./../../store/apiClient"
 import jwt_decode from "jwt-decode"
 
+const PAGE_LIMIT = 20
+
 interface User {
   acl: Array<any>
   id: string
@@ -81,7 +83,7 @@ const preparingTracksArrToDeleteOne = (
   return tracksArr
 }
 
-const PAGE_LIMIT = 20
+
 
 const queryPlaylists = `
 query findPlaylists($query: String!){
@@ -98,18 +100,13 @@ query findPlaylists($query: String!){
   }
 }
 `
-const testQueryPlaylists = `
+
+const queryPlaylistsCount = `
 query findPlaylists{
-    PlaylistFind(query:"[{}]"){
-    name
-    _id
-    tracks{
-      _id
-      originalFileName
-    }
-  }
+    PlaylistCount(query:"[{}]")
 }
 `
+
 
 const queryTracks = `
 query allTracks($query: String!){
@@ -191,14 +188,15 @@ export function* getPlaylistsSaga(): SagaIterator {
       console.log("getPlaylistsReq()")
       const allPlaylists = yield call(
         myFetch,
-        testQueryPlaylists,
+        queryPlaylistsCount,
         {},
         { headers: { Authorization: `Bearer ${authData}` } }
       )
-      yield put(actions.setPlaylistPageLength(allPlaylists.PlaylistFind.length))
+
+      yield put(actions.setPlaylistPageLength(allPlaylists.PlaylistCount))
       localStorage.setItem(
         "playlistPageLength",
-        `${allPlaylists.PlaylistFind.length}`
+        `${allPlaylists.PlaylistCount}`
       )
       yield put(actions.setPageLimit(PAGE_LIMIT))
       const limitedPlaylists = yield call(
