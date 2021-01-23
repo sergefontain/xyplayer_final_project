@@ -10,8 +10,6 @@ interface RefObject<T> {
 }
 
 declare module 'react-double-marquee'
+declare module 'html5-file-selector'
 
-// declare let FormData: {
-//   prototype: FormData;
-//   new (form?: HTMLFormElement): FormData;
-// };
+

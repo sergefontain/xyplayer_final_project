@@ -21,46 +21,64 @@ export function* authSaga(): SagaIterator {
   while (true) {
     const getToken = () => localStorage.getItem("token")
     const authData = yield call(getToken)
-    if (authData) {
-      yield put(actions.authSuccess(authData))
-    } else {
-      try {
-        const action = yield take(actions.authRequest)
-        const { login: token } = yield call(myFetch, query, {
-          login: action.payload.login,
-          password: action.payload.password,
-        })
-        localStorage.setItem("token", token)
-        
-        yield put(actions.authSuccess(token))
-      } catch (e) {
-        console.error("!!! function*authSaga -> error", e)
-        yield put(actions.authFailure(e))
-      }
-    }
+    try {
+      if (!!authData) {
+        yield put(actions.authSuccess(authData))
+      } else {
+        const {
+          payload: { login, password },
+        } = yield take(actions.authRequest)
 
-    yield take(actions.logout)
-    yield put(actions.logout())
-    localStorage.removeItem("token")
-    localStorage.removeItem("setTracksTrue")
-    localStorage.removeItem("playlistPageLength")
+        const { login: token } = yield call(myFetch, query, {
+          login: login,
+          password: password,
+        })
+        if (token === null) {
+          throw new Error(`authSaga ERROR`)
+          // continue
+        }
+
+        localStorage.setItem("token", token)
+        yield put(actions.authSuccess(token))
+      }
+
+      yield take(actions.logout)
+      yield put(actions.logout())
+      localStorage.removeItem("token")
+      localStorage.removeItem("setTracksTrue")
+      localStorage.removeItem("playlistCommonLength")
+      localStorage.removeItem("playlistModifiedLength")
+      localStorage.removeItem("playlistParticleLength")
+      localStorage.removeItem("limitOverloaded")
+      localStorage.removeItem("trackPageLimitOverload")
+      localStorage.removeItem("playlistCreated")
+      localStorage.removeItem("tracksArrSize")
+      localStorage.removeItem("tracksPagesCount")
+      localStorage.removeItem("stopLoopedPlay")
+      localStorage.removeItem("createdPlaylistId")
+      localStorage.removeItem("trackDeleteTrue")
+    } catch (e) {
+      console.log(e)
+      yield put(actions.authFailure(e))
+    }
   }
 }
 
 export function* regSaga(): SagaIterator {
   while (true) {
-    const regAction = yield take(actions.regRequest)
+    try {
+      const {
+        payload: { login, password },
+      } = yield take(actions.regRequest)
 
-    yield call(myFetch, mutation, {
-      login: regAction.payload.login,
-      password: regAction.payload.password,
-    })
+      yield call(myFetch, mutation, {
+        login: login,
+        password: password,
+      })
 
-    const { login: token } = yield call(myFetch, query, {
-      login: regAction.payload.login,
-      password: regAction.payload.password,
-    })
-    localStorage.setItem("token", token)
-    yield put(actions.authSuccess(token))
+      yield put(actions.authRequest({ login: login, password: password }))
+    } catch (e) {
+      throw new Error(`regSaga ERROR ${e}`)
+    }
   }
 }

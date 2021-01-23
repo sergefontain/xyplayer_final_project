@@ -1,3 +1,4 @@
+
 import { ActionType } from "typesafe-actions"
 import * as actions from "../actions"
 
@@ -45,28 +46,36 @@ export interface Track {
 }
 
 export interface PlaylistsFind {
+  map: any
   length: number
-  PlaylistFind: Array<Playlist>
+  PlaylistFind?: Array<Playlist> | undefined
 }
 
 export interface TracksFind {
-  TrackFind: Array<Track>
-  PlaylistFindOne: Playlist
+  TrackFind?: Array<Track> | undefined
+  PlaylistFindOne?: Playlist | undefined
 }
 
 export interface MainState {
-  playlists: PlaylistsFind | null
+  playlists: PlaylistsFind
   error: string
   queryStatus: string
-  tracks: TracksFind | null
-  playlistPage: number
   pageLimitOverload: boolean
-  currentPlaylistPage: string
-  formData: Object
+  currentPlaylistPage: number
   creationStatus: boolean
   preCreateError: string
   deleteTrackError: string
   deleteTrackStatus: string
   playlistOwnerId: string
   userId: string
+  tracksArrToUpload: any
+  tracksUploadStatus: string
+  tracksArrToUploadReady: any
+  unsortedTracksArr: Array<Track>
+  playlistBackendSortRule: string
+  trackOrderToPlay: string
+  trackPageLimitOverload: boolean
+  currentTrackPage: number
+  playlistIdOld: string
+  searchStatus: string
 }

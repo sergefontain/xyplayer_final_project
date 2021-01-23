@@ -1,17 +1,35 @@
 .alert-enter {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  .alert-enter-active {
-    opacity: 1;
-    transform: translateX(0);
-    transition: opacity 300ms, transform 300ms;
-  }
-  .alert-exit {
-    opacity: 1;
-  }
-  .alert-exit-active {
-    opacity: 0;
-    transform: scale(1.2);
-    transition: opacity 300ms, transform 300ms;
-  }
+  opacity: 0;
+  transform: scale(0.9);
+}
+.alert-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.alert-exit {
+  opacity: 1;
+}
+.alert-exit-active {
+  opacity: 0;
+  transform: scale(1.2);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.unselectable {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+   not supported by any browser */
+}
+
+.btn-info.focus,
+.btn-info:focus,
+.btn-info.active,
+.btn-info:active {
+  box-shadow: 0 0 0 0.2rem rgba(243, 212, 37, 0.5) !important;
+}
+

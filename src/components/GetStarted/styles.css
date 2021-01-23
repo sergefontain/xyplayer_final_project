@@ -1,0 +1,107 @@
+.dzu-previewContainer {
+  padding: 0 20px 0;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.dzu-dropzone {
+  animation: c-border 0.6s infinite both;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: 20px;
+}
+
+.dzu-previewFileName {
+  width: 64%;
+}
+
+/* .dzu-dropzone {
+  animation: c-border 0.6s infinite both;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: 20px;
+  align-items: center;
+  width: 100%;
+  min-height: 120px;
+  margin: 0 auto;
+  position: relative;
+  box-sizing: border-box;
+  transition: all 0.15s linear;
+  border: 2px solid #d9d9d9;
+  border-radius: 4px;
+} */
+
+.dzu-dropzone.dzu-dropzone-disabled > .col > label {
+  background: linear-gradient(
+    180deg,
+    rgb(197, 197, 197) 0%,
+    rgb(160, 160, 160) 10%,
+    rgb(131, 131, 131) 47%,
+    rgb(87, 87, 87) 77%,
+    rgb(59, 59, 59) 100%
+  );
+}
+
+.dzu-dropzone > .col > label {
+  background: linear-gradient(
+    180deg,
+    rgb(182, 247, 182, 1) 0%,
+    rgb(132, 241, 128, 1) 19%,
+    rgba(121, 214, 93, 1) 50%,
+    rgba(32, 189, 61, 1) 80%,
+    rgba(0, 157, 44, 1) 100%
+  );
+}
+.dzu-dropzone > .col > label:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 157, 44, 1) 0%,
+    rgba(32, 189, 61, 1) 19%,
+    rgba(121, 214, 93, 1) 50%,
+    rgba(132, 241, 128, 1) 80%,
+    rgba(182, 247, 182, 1) 100%
+  );
+}
+
+.dz-bg {
+  margin: 10px auto;
+  width: 400px;
+  height: 200px;
+  overflow: hidden;
+  background: url(./dropfiles.png) no-repeat 50% 50% / 100%;
+}
+
+.dz-bg-act {
+  margin: 10px auto;
+  width: 400px;
+  height: 200px;
+  overflow: hidden;
+  background: url(./dropfilesact.png) no-repeat 50% 50% / 100%;
+}
+
+.dzu-dropzone label {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+@keyframes c-border {
+  0% {
+    border-style: dashed;
+  }
+  25% {
+    border-style: dotted;
+  }
+  50% {
+    border-style: dashed;
+  }
+  75% {
+    border-style: dotted;
+  }
+  100% {
+    border-style: dashed;
+  }
+}

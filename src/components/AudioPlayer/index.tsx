@@ -1,11 +1,12 @@
 import React from "react"
 import { bindActionCreators, Dispatch } from "redux"
 import { RootAction, RootState } from "../../store/rootReducer"
-import * as playerActions from "../../store/actions"
+import * as actions from "../../store/actions"
 import { connect } from "react-redux"
-import { Button, Row, Col } from "react-bootstrap"
+import { Button, Row, Col, Image } from "react-bootstrap"
 import Marquee from "react-double-marquee"
 import volRotatorImg from "./rotator.png"
+import { TrackResolver } from "../GetPlaylists"
 
 interface State {
   play: boolean
@@ -29,6 +30,18 @@ interface TrackProps {
   src: string
   title: string | undefined
   originName: string
+  playState: boolean
+  setShowButton: React.Dispatch<React.SetStateAction<boolean>>
+  index?: number | undefined
+  arr?: Array<HTMLDivElement> | undefined
+  buttonsArr?: TrackResolver["buttonsArr"] | undefined
+  closeBtnRef?: TrackResolver["closeBtnRef"] | undefined
+  setShowMessage: React.Dispatch<React.SetStateAction<string>>
+  setPlayState?: React.Dispatch<React.SetStateAction<boolean>> | undefined
+  // isPlayDone?: boolean | undefined
+  setIsSingleMode?: React.Dispatch<React.SetStateAction<boolean>> | undefined
+  isSingleMode?: boolean | undefined
+  nextImg: string
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -37,22 +50,34 @@ type Props = ReturnType<typeof mapStateToProps> &
 
 const mapStateToProps = (state: RootState) => ({
   oldVolValueToProps: state.play.volValue,
+  oldCurrTime: state.play.currTime,
+  turnOnTracksPlay: state.play.turnOnTracksPlay,
+  orderPlay: state.main.trackOrderToPlay,
+  playingStatus: state.play.playingStatus,
 })
 const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
   bindActionCreators(
     {
-      setOldVolValue: (payload) => playerActions.savingVolValue(payload),
+      setOldVolValue: (payload) => actions.savingVolValue(payload),
+      setPlayingStatus: (payload, meta) =>
+        actions.setPlayingStatus(payload, meta),
+      setShowPlaylistTracks: (payload) =>
+        actions.setShowPlaylistTracks(payload),
+      setOldCurrTime: (payload) => actions.setPlayerCurrTime(payload),
+      setPlayingMode: (payload) => actions.setPlayingMode(payload),
+      setTrackPlayState: (payload) => actions.setPlayStateAction(payload),
     },
     dispatch
   )
 
 var i = 0
+
 let ctx, x_end, y_end, bar_height
 const bars = 50
 const radius = 0
 const bar_width = 20
-let canvasH = window.innerHeight / 2
-let canvasW = window.innerWidth / 2
+let canvasH = 600
+let canvasW = 900
 
 let rotValue = 0
 let rotStep = 1
@@ -72,6 +97,8 @@ class Music extends React.PureComponent<Props, State> {
   canvasElement!: HTMLCanvasElement | null
   rotator!: HTMLImageElement | null
   imgRef: React.RefObject<HTMLImageElement>
+  playerSlideRef: React.RefObject<HTMLImageElement>
+  playerSlide!: HTMLImageElement | null
   rotMin!: number
   rotMax!: number
   rotMinAngle!: number
@@ -79,6 +106,7 @@ class Music extends React.PureComponent<Props, State> {
   ratio: number
   isFirefox: boolean
   volLevContainer!: HTMLDivElement | null
+  playBtn: React.MutableRefObject<HTMLButtonElement | null>
 
   constructor(props: Props) {
     super(props)
@@ -101,6 +129,8 @@ class Music extends React.PureComponent<Props, State> {
     this.refTimeRange = React.createRef()
     this.imgRef = React.createRef()
     this.volLevText = React.createRef()
+    this.playBtn = React.createRef()
+    this.playerSlideRef = React.createRef()
 
     this.rotMin = 0
     this.rotMax = 100
@@ -119,6 +149,7 @@ class Music extends React.PureComponent<Props, State> {
   }
 
   componentDidMount() {
+    this.playerSlide = this.playerSlideRef.current
     this.canvasElement = this.canvas.current
     this.audioTrack1 = this.audioRef.current
     this.audioTrack1!.crossOrigin = "anonymous"
@@ -131,15 +162,70 @@ class Music extends React.PureComponent<Props, State> {
     this.canvasElement!.height = 0
     this.volLevContainer!.style.color = "teal"
     this.volLevContainer!.style.textShadow = "1px -1px 4px #119600"
+    if (this.props.playState) {
+      this.audioTrack1!.play()
+    }
 
     this.rotator!.style.transform = `rotate(${this.getRotAngle()}deg)`
     this.setState({ volTrack: +this.state.rotatorVal / 100 })
 
     this.setVolValue(+this.state.rotatorVal)
 
-    this.audioTrack1!.addEventListener("ended", () =>
+    this.audioTrack1!.addEventListener("play", () => {
+      this.setState({ play: true })
+      this.rafId = requestAnimationFrame(this.tick)
+      this.canvasElement!.width = canvasW
+      this.canvasElement!.height = canvasH
+    })
+
+    this.audioTrack1!.addEventListener("ended", () => {
       this.setState({ play: false })
-    )
+      cancelAnimationFrame(this.rafId)
+      this.canvasElement!.width = 0
+      this.canvasElement!.height = 0
+      this.props.setShowMessage("")
+      this.props.setShowButton(true)
+      this.props.setTrackPlayState("")
+      if (this.props.arr?.length) {
+        this.props.setPlayingStatus(
+          // this.props.isPlayDone ||
+          this.props.isSingleMode ? "" : "ended",
+          {
+            i: this.props.index,
+            arr: this.props.arr,
+            buttons:
+              this.props.buttonsArr !== undefined &&
+              this.props.buttonsArr["prevButton"] !== null &&
+              this.props.buttonsArr["nextButton"] !== null
+                ? {
+                    prevButton: this.props.buttonsArr.prevButton,
+                    nextButton: this.props.buttonsArr.nextButton,
+                  }
+                : { prevButton: null, nextButton: null },
+            closeBtnRef: this.props.closeBtnRef,
+            playBtn: this.playBtn,
+          }
+        )
+        if (
+          this.props.setPlayState !== undefined &&
+          this.props.isSingleMode !== undefined
+        ) {
+          this.props.setPlayState(false)
+        }
+        if (
+          this.props.setPlayState !== undefined &&
+          // this.props.isPlayDone &&
+          this.props.setIsSingleMode !== undefined
+        ) {
+          this.props.setPlayState(false)
+          this.props.setIsSingleMode(true)
+        }
+
+        this.props.setShowPlaylistTracks(true)
+      } else {
+        this.props.setPlayingStatus("ended", undefined)
+      }
+    })
 
     if (this.props.oldVolValueToProps) {
       this.setState({
@@ -252,6 +338,9 @@ class Music extends React.PureComponent<Props, State> {
       // функция запрещает захват картинки по mousedown левой клавишы мыши
       return false
     }
+    this.playerSlide!.ondragstart = function () {
+      return false
+    }
   }
 
   componentDidUpdate() {
@@ -274,9 +363,62 @@ class Music extends React.PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    this.audioTrack1!.removeEventListener("ended", () =>
+    this.audioTrack1!.removeEventListener("play", () => {
+      this.setState({ play: true })
+      this.rafId = requestAnimationFrame(this.tick)
+      this.canvasElement!.width = canvasW
+      this.canvasElement!.height = canvasH
+    })
+
+    this.audioTrack1!.removeEventListener("ended", () => {
       this.setState({ play: false })
-    )
+      cancelAnimationFrame(this.rafId)
+      this.canvasElement!.width = 0
+      this.canvasElement!.height = 0
+      this.props.setShowMessage("")
+      this.props.setShowButton(true)
+      this.props.setTrackPlayState("")
+      if (this.props.arr?.length) {
+        this.props.setPlayingStatus(
+          // this.props.isPlayDone ||
+          this.props.isSingleMode ? "" : "ended",
+          {
+            i: this.props.index,
+            arr: this.props.arr,
+            buttons:
+              this.props.buttonsArr !== undefined &&
+              this.props.buttonsArr["prevButton"] !== null &&
+              this.props.buttonsArr["nextButton"] !== null
+                ? {
+                    prevButton: this.props.buttonsArr.prevButton,
+                    nextButton: this.props.buttonsArr.nextButton,
+                  }
+                : { prevButton: null, nextButton: null },
+            closeBtnRef: this.props.closeBtnRef,
+            playBtn: this.playBtn,
+          }
+        )
+        if (
+          this.props.setPlayState !== undefined &&
+          this.props.isSingleMode !== undefined
+        ) {
+          this.props.setPlayState(false)
+        }
+        if (
+          this.props.setPlayState !== undefined &&
+          // this.props.isPlayDone &&
+          this.props.setIsSingleMode !== undefined
+        ) {
+          this.props.setPlayState(false)
+          this.props.setIsSingleMode(true)
+        }
+
+        this.props.setShowPlaylistTracks(true)
+      } else {
+        this.props.setPlayingStatus("ended", undefined)
+      }
+    })
+
     cancelAnimationFrame(this.rafId)
     this.analyser.disconnect()
     this.source.disconnect()
@@ -334,6 +476,7 @@ class Music extends React.PureComponent<Props, State> {
     let lineColor = ""
     if (frequency < 75) {
       if (this.state.play) {
+        // if (this.props.playToProps) {
         i = i + 1
         if (i / 10 < 40) {
           lineColor = `rgb(${238},${10},${230}` // ярко-фиолетовый
@@ -382,8 +525,6 @@ class Music extends React.PureComponent<Props, State> {
 
     if (!this.state.play) {
       ctx!.clearRect(0, 0, canvas.width, canvas.height)
-      this.canvasElement!.width = 0
-      this.canvasElement!.height = 0
     }
   }
 
@@ -393,12 +534,15 @@ class Music extends React.PureComponent<Props, State> {
     this.rafId = requestAnimationFrame(this.tick)
   }
 
-  togglePlay = (): void => {
+  togglePlay = () => {
     this.setState({ play: !this.state.play }, () => {
       if (this.state.play) {
         this.rafId = requestAnimationFrame(this.tick)
         this.canvasElement!.width = canvasW
         this.canvasElement!.height = canvasH
+        if (this.props.setPlayState !== undefined) {
+          this.props.setPlayState(true)
+        }
         this.audioTrack1!.play()
       } else {
         cancelAnimationFrame(this.rafId)
@@ -479,7 +623,7 @@ class Music extends React.PureComponent<Props, State> {
 
   render() {
     return (
-      <Row>
+      <Row className="ml-0">
         <Col
           sm={12}
           md={12}
@@ -487,30 +631,38 @@ class Music extends React.PureComponent<Props, State> {
           xl={6}
           className="d-flex flex-column justify-content-between"
         >
-          <Row className="">
-            {this.state.play ? (
-              <Col className="d-flex align-items-center my-3">
+          <Row
+            className=""
+            style={{
+              position: "absolute",
+              zIndex: 1,
+              top: "15px",
+              left: "30px",
+              width: "100%",
+            }}
+          >
+            <Col
+              className={
+                this.state.play
+                  ? "d-flex align-items-center mt-3 pr-0"
+                  : "mt-3 pr-0"
+              }
+            >
+              <div className="p-2 bg-light" style={{ width: "min-content" }}>
                 <Button
                   onClick={this.togglePlay}
-                  variant="warning"
+                  variant={this.state.play ? "warning" : "outline-danger"}
                   className="px-5"
+                  ref={(elem: HTMLButtonElement | null) =>
+                    elem ? (this.playBtn.current = elem) : null
+                  }
                 >
-                  PAUSE
+                  {this.state.play ? "PAUSE" : "PLAY"}
                 </Button>
-              </Col>
-            ) : (
-              <Col className="my-3">
-                <Button
-                  onClick={this.togglePlay}
-                  variant="outline-danger"
-                  className="px-5"
-                >
-                  PLAY
-                </Button>
-              </Col>
-            )}
+              </div>
+            </Col>
             {this.state.play ? (
-              <Col className="mt-3 mx-3 bg-white">
+              <Col className="mt-3 mr-5 ml-3 bg-white">
                 <div
                   className="pr-3 text-warning font-weight-bold text-outline-grey"
                   style={{
@@ -522,13 +674,18 @@ class Music extends React.PureComponent<Props, State> {
                 <div
                   className="text-monospace text-outline-green"
                   style={{
-                    width: "250px",
+                    maxWidth: "200px",
                     whiteSpace: "nowrap",
                     fontSize: "1.1rem",
                     color: "green",
                   }}
                 >
-                  <Marquee delay={1000} speed={0.02}>
+                  <Marquee
+                    delay={1000}
+                    speed={0.02}
+                    direction="left"
+                    childMargin={100}
+                  >
                     {this.props.title
                       ? this.props.title
                       : this.props.originName}
@@ -538,10 +695,25 @@ class Music extends React.PureComponent<Props, State> {
             ) : null}
           </Row>
           <Row>
-            <Col className="mx-2 mb-5">
+            <Col className="my-2 px-0">
+              <Image
+                src={this.props.nextImg}
+                style={{ position: "relative", width: "100%" }}
+                fluid
+                ref={this.playerSlideRef}
+              />
+              {this.state.play ? (
+                <div className="beforePicMiddleLayer"></div>
+              ) : null}
               <canvas
                 ref={this.canvas}
-                style={{ minWidth: "200px", width: "100%", height: "100%" }}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  position: "absolute",
+                  left: 0,
+                  top: "18%",
+                }}
               />
               <audio
                 src={`/${this.props.src}`}
@@ -554,135 +726,148 @@ class Music extends React.PureComponent<Props, State> {
         </Col>
         <Col xs={12} sm={12} md={12} lg={12} xl={6} className="d-flex">
           <Row className="justify-content-center flex-grow-1">
-            <Col
-              sm={8}
-              md={6}
-              lg={6}
-              xl={8}
-              className="trackControlPanel rounded mt-3 mb-5 d-flex flex-column"
-            >
-              <Row>
+            <Col className="d-flex align-items-center">
+              <Row className="flex-grow-1 d-flex">
                 <Col
-                  className="timeScreen mt-2 mx-3"
-                  style={{ lineHeight: "2rem" }}
+                  sm={8}
+                  md={6}
+                  lg={6}
+                  xl={8}
+                  className="trackControlPanel rounded d-flex flex-column flex-grow-1"
+                  style={{
+                    background: "#D4D8DB",
+                    height: "min-content",
+                  }}
                 >
-                  <span className="fs1rmd titleTimeScreen px-2">
-                    CurrentTime:
-                  </span>
-                  <div className="fs2rmd pb-2">
-                    {this.state.currMinTime} min {this.state.currSecBalanceTime}{" "}
-                    sec
-                  </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col
-                  className="additionalScreen mb-5 mx-3"
-                  style={{ lineHeight: "1rem" }}
-                >
-                  <span className="fs1m additionalTitle px-3">TotalTime:</span>
-                  <div className="fs1rmd d-inline-block py-3 px-2 text-monospace">
-                    {this.state.totalMinDuration} min{" "}
-                    {this.state.secBalanceDuration} sec
-                  </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col className="d-flex border border-warning p-0 mx-3 mb-5 pr-2 align-items-center">
-                  <div className="timeLineTitle mx-3 d-inline-block px-3">
-                    Time Line:
-                  </div>
-                  <div className="d-inline-flex align-items-center flex-grow-1 py-2">
-                    <input
-                      ref={this.refTimeRange}
-                      id="timeRange"
-                      type="range"
-                      min="0"
-                      max={this.state.totalTimeDuration}
-                    />
-                  </div>
-                </Col>
-              </Row>
-              <Row className="mb-4 flex-grow-1">
-                <Col className="d-flex flex-column align-items-center justify-content-center">
                   <Row>
-                    <Col>
+                    <Col
+                      className="timeScreen mt-2 mx-3"
+                      style={{ lineHeight: "2rem" }}
+                    >
+                      <span className="fs1rmd titleTimeScreen px-2">
+                        CurrentTime:
+                      </span>
+                      <div className="fs2rmd pb-2">
+                        {this.state.currMinTime} min{" "}
+                        {this.state.currSecBalanceTime} sec
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col
+                      className="additionalScreen mb-3 mx-3"
+                      style={{ lineHeight: "1rem" }}
+                    >
+                      <span className="fs1m additionalTitle px-3">
+                        TotalTime:
+                      </span>
+                      <div className="fs1rmd d-inline-block py-3 px-2 text-monospace">
+                        {this.state.totalMinDuration} min{" "}
+                        {this.state.secBalanceDuration} sec
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="d-flex border border-warning p-0 mx-3 mb-2 pr-2 align-items-center">
+                      <div className="timeLineTitle mx-3 d-inline-block px-3">
+                        TimeLine:
+                      </div>
+                      <div className="d-inline-flex align-items-center flex-grow-1 py-2">
+                        <input
+                          ref={this.refTimeRange}
+                          id="timeRange"
+                          type="range"
+                          min="0"
+                          max={this.state.totalTimeDuration}
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row className="my-5 mx-2">
+                    <Col className="d-flex flex-column align-items-center justify-content-center">
                       <Row>
-                        <Col className="d-flex border border-info mb-2 bg-white p-0">
-                          <div
-                            className="fs2rmd"
-                            ref={this.volLevText}
-                            style={{ width: "100px", textAlign: "center" }}
-                          >
-                            {this.state.rotatorVal.toFixed(0)}
-                          </div>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col
-                          className="d-flex flex-column align-items-center pb-2"
-                          style={{ lineHeight: "1rem", fontWeight: "bolder" }}
-                        >
-                          <span>Volume</span> <span>Level</span>
+                        <Col>
+                          <Row>
+                            <Col className="d-flex border border-info mb-2 bg-white p-0">
+                              <div
+                                className="fs2rmd"
+                                ref={this.volLevText}
+                                style={{ width: "100px", textAlign: "center" }}
+                              >
+                                {this.state.rotatorVal.toFixed(0)}
+                              </div>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col
+                              className="d-flex flex-column align-items-center pb-2"
+                              style={{
+                                lineHeight: "1rem",
+                                fontWeight: "bolder",
+                              }}
+                            >
+                              <span>Volume</span> <span>Level</span>
+                            </Col>
+                          </Row>
                         </Col>
                       </Row>
                     </Col>
-                  </Row>
-                </Col>
 
-                <Col className="d-flex flex-column justify-content-center">
-                  <Row>
-                    <Col className="d-flex flex-column align-items-center border border-dark bg-secondary rounded-pill py-2 mx-3">
-                      <img
-                        ref={this.imgRef}
-                        src={volRotatorImg}
-                        alt=""
-                        className="rounded-circle"
-                      />
+                    <Col className="d-flex flex-column justify-content-center">
+                      <Row>
+                        <Col className="d-flex flex-column align-items-center border border-dark bg-secondary rounded-pill py-2 mx-3">
+                          <img
+                            ref={this.imgRef}
+                            src={volRotatorImg}
+                            alt=""
+                            className="rounded-circle"
+                          />
+                        </Col>
+                      </Row>
                     </Col>
                   </Row>
-                </Col>
-              </Row>
-              <Row>
-                <Col className="d-flex mb-5 mx-3 p-0 justify-content-between">
-                  {!this.state.volLoopValue ? (
-                    <Button
-                      onClick={this.loopInstall}
-                      size="lg"
-                      variant="outline-success"
-                      style={{ width: "30%" }}
-                    >
-                      Loop
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={this.loopInstall}
-                      size="lg"
-                      variant="success"
-                      style={{ width: "30%" }}
-                    >
-                      Looped
-                    </Button>
-                  )}
-                  {!this.state.volMute ? (
-                    <Button
-                      onClick={this.muteInstall}
-                      size="lg"
-                      variant="outline-dark"
-                      style={{ width: "30%" }}
-                    >
-                      Mute
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={this.muteInstall}
-                      size="lg"
-                      variant="dark"
-                      style={{ width: "30%" }}
-                    >
-                      Muted
-                    </Button>
-                  )}
+                  <Row>
+                    <Col className="d-flex mb-3 mx-3 p-0 justify-content-between">
+                      {!this.state.volLoopValue ? (
+                        <Button
+                          onClick={this.loopInstall}
+                          size="lg"
+                          variant="outline-success"
+                          style={{ width: "30%" }}
+                        >
+                          Loop
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={this.loopInstall}
+                          size="lg"
+                          variant="success"
+                          style={{ width: "30%" }}
+                        >
+                          Looped
+                        </Button>
+                      )}
+                      {!this.state.volMute ? (
+                        <Button
+                          onClick={this.muteInstall}
+                          size="lg"
+                          variant="outline-dark"
+                          style={{ width: "30%" }}
+                        >
+                          Mute
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={this.muteInstall}
+                          size="lg"
+                          variant="dark"
+                          style={{ width: "30%" }}
+                        >
+                          Muted
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Col>

@@ -3,10 +3,10 @@ import * as actions from "../actions"
 import { AuthAction, AuthState } from "./types"
 
 const initialState: AuthState = {
-  isLogon: false,
   authStatus: "",
-  error: "",
+  isLogon: false,
   token: "",
+  error: "",
 }
 
 const authReducer = (
@@ -19,8 +19,8 @@ const authReducer = (
         ...state,
         authStatus: "success",
         isLogon: true,
-        error: "",
         token: action.payload,
+        error: "",
       }
     case getType(actions.authFailure):
       return {
@@ -30,12 +30,17 @@ const authReducer = (
         error: action.payload,
         token: "",
       }
+      case getType(actions.setEmptyAuthStatus):
+      return {
+        ...state,
+        authStatus: "",
+      }
     case getType(actions.logout):
       return {
         ...state,
-        token: "",
+        authStatus: "",
         isLogon: false,
-        authStatus: "failure",
+        token: "",
         error: "",
       }
     default:

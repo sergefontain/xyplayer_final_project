@@ -1,6 +1,7 @@
 import React from "react"
 import logo from "./xy_logo_100x180.png"
 import "./App.css"
+import "react-dropzone-uploader/dist/styles.css"
 import { BrowserRouter, Link, Redirect, Route, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import { RootState, RootAction } from "./store/rootReducer"
@@ -12,7 +13,6 @@ import Login from "./components/Login"
 import { bindActionCreators, Dispatch } from "redux"
 import * as actions from "./store/actions"
 
-
 const mapStateToProps = (state: RootState) => ({
   isAuth: state.auth.isLogon,
 })
@@ -23,7 +23,6 @@ type Props = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>
 
 function App({ isAuth, logoutToProps }: Props) {
-
   const ProtectedRoute = (props: any) => {
     if (isAuth) {
       return <Route {...props} />
@@ -48,13 +47,14 @@ function App({ isAuth, logoutToProps }: Props) {
       <div id="wrapper">
         <header id="header">
           <div className="container">
-            <div className="header-logo mr-4">
+            <div className="header-logo mr-4 unselectable">
               <a href="/">
                 <img src={logo} alt="logo yoga" />
               </a>
             </div>
-            <div className="slogan d-flex flex-column mr-auto">
-              <span>Make Your Innervoice</span><span>Global!</span>
+            <div className="slogan d-flex flex-column mr-auto unselectable">
+              <span>Make Your Innervoice</span>
+              <span>Global!</span>
             </div>
             <nav className="main-nav">
               <input id="menu__toggle" type="checkbox" />
