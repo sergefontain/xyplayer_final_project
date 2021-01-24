@@ -64,7 +64,6 @@ const Registration: React.FC<Props> = ({ regRequest }) => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (password === password2) {
-      setIsCredsRight("Right")
       regRequest({ login, password })
     } else {
       setIsCredsRight("Wrong")
@@ -200,7 +199,7 @@ const Registration: React.FC<Props> = ({ regRequest }) => {
                     }}
                   >
                     <Alert.Heading className="text-warning">
-                      Left a little!
+                      Almost Ready!
                     </Alert.Heading>
                     <Row>
                       <Col className="text-light mb-3">
@@ -218,7 +217,7 @@ const Registration: React.FC<Props> = ({ regRequest }) => {
                           }}
                           className="border-0"
                         >
-                          Go to the final Step!
+                          Complete Registration
                         </Button>
                       </Col>
                     </Row>
@@ -264,7 +263,7 @@ const Registration: React.FC<Props> = ({ regRequest }) => {
                           onClick={() => setIsFinalStep("")}
                           type="submit"
                         >
-                          Register And Login Now!
+                          {"Complete & Login Now!"}
                         </Button>
                       </Col>
                     </Row>
