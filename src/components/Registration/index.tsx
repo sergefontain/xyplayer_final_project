@@ -217,7 +217,7 @@ const Registration: React.FC<Props> = ({ regRequest }) => {
                           }}
                           className="border-0"
                         >
-                          Complete Registration
+                          Proceed To Complete
                         </Button>
                       </Col>
                     </Row>
