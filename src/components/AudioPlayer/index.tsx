@@ -255,8 +255,10 @@ class Music extends React.PureComponent<Props, State> {
   onTrackPlay = (): void => {
     this.setState({ play: true })
     this.rafId = requestAnimationFrame(this.tick)
-    this.canvasElement!.width = canvasW
-    this.canvasElement!.height = canvasH
+    if (this.canvasElement) {
+      this.canvasElement.width = canvasW
+      this.canvasElement.height = canvasH
+    }
   }
 
   onTrackEnded = (): void => {
@@ -391,10 +393,13 @@ class Music extends React.PureComponent<Props, State> {
 
   setVolValue = (newValue: number): void => {
     rotValue = newValue
-    this.rotator!.style.transform = `rotate(${this.getRotAngle()}deg)`
+    if (this.rotator) {
+      this.rotator.style.transform = `rotate(${this.getRotAngle()}deg)`
+    }
   }
 
-  getRotAngle = ():number => (rotValue - this.rotMin) * this.ratio + this.rotMinAngle
+  getRotAngle = (): number =>
+    (rotValue - this.rotMin) * this.ratio + this.rotMinAngle
 
   animationLooper(canvas: HTMLCanvasElement): void {
     let width = (canvas.width = canvasW)
