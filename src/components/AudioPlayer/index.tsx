@@ -44,10 +44,6 @@ interface TrackProps {
   nextImg: string
 }
 
-type Props = ReturnType<typeof mapStateToProps> &
-  ReturnType<typeof mapDispatchToProps> &
-  TrackProps
-
 const mapStateToProps = (state: RootState) => ({
   oldVolValueToProps: state.play.volValue,
   oldCurrTime: state.play.currTime,
@@ -70,43 +66,45 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
     dispatch
   )
 
-var i = 0
+type Props = ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps> &
+  TrackProps
 
+var i = 0
 let ctx, x_end, y_end, bar_height
 const bars = 50
 const radius = 0
 const bar_width = 20
 let canvasH = 600
 let canvasW = 900
-
 let rotValue = 0
 let rotStep = 1
 
 class Music extends React.PureComponent<Props, State> {
-  source: any
-  analyser: any
-  frequency_array: any
   canvas: React.RefObject<HTMLCanvasElement>
-  rafId!: number
   audioRef: React.RefObject<HTMLAudioElement>
   refVolRange: React.RefObject<HTMLInputElement>
   refTimeRange: React.RefObject<HTMLInputElement>
   volLevText: React.RefObject<HTMLDivElement>
-  audioTrack1!: HTMLAudioElement | null
-  timeRanger!: HTMLInputElement | null
-  canvasElement!: HTMLCanvasElement | null
-  rotator!: HTMLImageElement | null
   imgRef: React.RefObject<HTMLImageElement>
   playerSlideRef: React.RefObject<HTMLImageElement>
-  playerSlide!: HTMLImageElement | null
+  playBtn: React.MutableRefObject<HTMLButtonElement | null>
+  audioTrack1: HTMLAudioElement | null | undefined
+  timeRanger: HTMLInputElement | null | undefined
+  canvasElement: HTMLCanvasElement | null | undefined
+  rotator: HTMLImageElement | null | undefined
+  playerSlide: HTMLImageElement | null | undefined
+  volLevContainer: HTMLDivElement | null | undefined
+  rafId!: number
   rotMin!: number
   rotMax!: number
   rotMinAngle!: number
   rotMaxAngle!: number
+  source!: MediaElementAudioSourceNode
+  analyser!: AnalyserNode
+  frequency_array!: Uint8Array
   ratio: number
   isFirefox: boolean
-  volLevContainer!: HTMLDivElement | null
-  playBtn: React.MutableRefObject<HTMLButtonElement | null>
 
   constructor(props: Props) {
     super(props)
@@ -152,88 +150,54 @@ class Music extends React.PureComponent<Props, State> {
     this.playerSlide = this.playerSlideRef.current
     this.canvasElement = this.canvas.current
     this.audioTrack1 = this.audioRef.current
-    this.audioTrack1!.crossOrigin = "anonymous"
     this.timeRanger = this.refTimeRange.current
     this.volLevContainer = this.volLevText.current
     this.rotator = this.imgRef.current
-    this.rotator!.width = 100
-    this.rotator!.height = 100
-    this.canvasElement!.width = 0
-    this.canvasElement!.height = 0
-    this.volLevContainer!.style.color = "teal"
-    this.volLevContainer!.style.textShadow = "1px -1px 4px #119600"
-    if (this.props.playState) {
-      this.audioTrack1!.play()
-    }
 
-    this.rotator!.style.transform = `rotate(${this.getRotAngle()}deg)`
     this.setState({ volTrack: +this.state.rotatorVal / 100 })
-
     this.setVolValue(+this.state.rotatorVal)
 
-    this.audioTrack1!.addEventListener("play", () => {
-      this.setState({ play: true })
-      this.rafId = requestAnimationFrame(this.tick)
-      this.canvasElement!.width = canvasW
-      this.canvasElement!.height = canvasH
-    })
-
-    this.audioTrack1!.addEventListener("ended", () => {
-      this.setState({ play: false })
-      cancelAnimationFrame(this.rafId)
-      this.canvasElement!.width = 0
-      this.canvasElement!.height = 0
-      this.props.setShowMessage("")
-      this.props.setShowButton(true)
-      this.props.setTrackPlayState("")
-      if (this.props.arr?.length) {
-        this.props.setPlayingStatus(
-          // this.props.isPlayDone ||
-          this.props.isSingleMode ? "" : "ended",
-          {
-            i: this.props.index,
-            arr: this.props.arr,
-            buttons:
-              this.props.buttonsArr !== undefined &&
-              this.props.buttonsArr["prevButton"] !== null &&
-              this.props.buttonsArr["nextButton"] !== null
-                ? {
-                    prevButton: this.props.buttonsArr.prevButton,
-                    nextButton: this.props.buttonsArr.nextButton,
-                  }
-                : { prevButton: null, nextButton: null },
-            closeBtnRef: this.props.closeBtnRef,
-            playBtn: this.playBtn,
-          }
-        )
-        if (
-          this.props.setPlayState !== undefined &&
-          this.props.isSingleMode !== undefined
-        ) {
-          this.props.setPlayState(false)
-        }
-        if (
-          this.props.setPlayState !== undefined &&
-          // this.props.isPlayDone &&
-          this.props.setIsSingleMode !== undefined
-        ) {
-          this.props.setPlayState(false)
-          this.props.setIsSingleMode(true)
-        }
-
-        this.props.setShowPlaylistTracks(true)
-      } else {
-        this.props.setPlayingStatus("ended", undefined)
+    if (this.props.playState) {
+      if (this.audioTrack1) {
+        this.audioTrack1.play()
       }
-    })
-
+    }
     if (this.props.oldVolValueToProps) {
       this.setState({
         rotatorVal: +(this.props.oldVolValueToProps * 100).toFixed(0),
       })
       this.setState({ volTrack: this.props.oldVolValueToProps })
-
       this.setVolValue(+(this.props.oldVolValueToProps * 100).toFixed(0))
+    }
+
+    if (this.volLevContainer) {
+      this.volLevContainer.style.color = "teal"
+      this.volLevContainer.style.textShadow = "1px -1px 4px #119600"
+    }
+    if (this.canvasElement) {
+      this.canvasElement.width = 0
+      this.canvasElement.height = 0
+    }
+
+    if (this.audioTrack1) {
+      this.audioTrack1.crossOrigin = "anonymous"
+      this.audioTrack1.addEventListener("play", this.onTrackPlay)
+      this.audioTrack1.addEventListener("ended", this.onTrackEnded)
+    }
+    if (this.rotator) {
+      this.rotator.width = 100
+      this.rotator.height = 100
+      this.rotator.style.transform = `rotate(${this.getRotAngle()}deg)`
+
+      this.rotator.addEventListener("click", this.onClick)
+      this.rotator.addEventListener("wheel", this.onWheel)
+      this.rotator.addEventListener("dragstart", this.onRotatorDragStart)
+    }
+    if (this.playerSlide) {
+      this.playerSlide.addEventListener("dragstart", this.onSlideDragStart)
+    }
+    if (this.timeRanger) {
+      this.timeRanger.addEventListener("change", this.onChange)
     }
 
     this.context = new AudioContext()
@@ -242,9 +206,113 @@ class Music extends React.PureComponent<Props, State> {
     this.source.connect(this.analyser)
     this.analyser.connect(this.context.destination)
     this.frequency_array = new Uint8Array(this.analyser.frequencyBinCount)
+  }
 
-    this.rotator!.onclick = (e: MouseEvent) => {
-      const { left, width } = this.rotator!.getBoundingClientRect()
+  componentDidUpdate() {
+    if (this.audioTrack1) {
+      this.audioTrack1.loop = this.state.volLoopValue
+      if (this.state.volTrack) {
+        this.audioTrack1.volume = this.state.volTrack
+      }
+    }
+    if (this.volLevContainer) {
+      if (this.state.rotatorVal <= 33) {
+        this.volLevContainer.style.color = "teal"
+        this.volLevContainer.style.textShadow = "1px -1px 4px #119600"
+      }
+      if (this.state.rotatorVal > 33) {
+        this.volLevContainer.style.color = "#ffc107"
+        this.volLevContainer.style.textShadow = "1px -1px 4px #FFB905"
+      }
+      if (this.state.rotatorVal > 66) {
+        this.volLevContainer.style.color = "#dc3545"
+        this.volLevContainer.style.textShadow = "1px -1px 4px #FF0511"
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.audioTrack1) {
+      this.audioTrack1.removeEventListener("play", this.onTrackPlay)
+      this.audioTrack1.removeEventListener("ended", this.onTrackEnded)
+    }
+    if (this.rotator) {
+      this.rotator.removeEventListener("click", this.onClick)
+      this.rotator.removeEventListener("wheel", this.onWheel)
+      this.rotator.removeEventListener("dragstart", this.onRotatorDragStart)
+    }
+    if (this.playerSlide) {
+      this.playerSlide.removeEventListener("dragstart", this.onSlideDragStart)
+    }
+    if (this.timeRanger) {
+      this.timeRanger.removeEventListener("change", this.onChange)
+    }
+    cancelAnimationFrame(this.rafId)
+    this.analyser.disconnect()
+    this.source.disconnect()
+  }
+
+  onTrackPlay = (): void => {
+    this.setState({ play: true })
+    this.rafId = requestAnimationFrame(this.tick)
+    this.canvasElement!.width = canvasW
+    this.canvasElement!.height = canvasH
+  }
+
+  onTrackEnded = (): void => {
+    this.setState({ play: false })
+    cancelAnimationFrame(this.rafId)
+    if (this.canvasElement) {
+      this.canvasElement.width = 0
+      this.canvasElement.height = 0
+    }
+    this.props.setShowMessage("")
+    this.props.setShowButton(true)
+    this.props.setTrackPlayState("")
+
+    if (this.props.arr?.length) {
+      this.props.setPlayingStatus(
+        // this.props.isPlayDone ||
+        this.props.isSingleMode ? "" : "ended",
+        {
+          i: this.props.index,
+          arr: this.props.arr,
+          buttons:
+            this.props.buttonsArr !== undefined &&
+            this.props.buttonsArr["prevButton"] !== null &&
+            this.props.buttonsArr["nextButton"] !== null
+              ? {
+                  prevButton: this.props.buttonsArr.prevButton,
+                  nextButton: this.props.buttonsArr.nextButton,
+                }
+              : { prevButton: null, nextButton: null },
+          closeBtnRef: this.props.closeBtnRef,
+          playBtn: this.playBtn,
+        }
+      )
+      if (
+        this.props.setPlayState !== undefined &&
+        this.props.isSingleMode !== undefined
+      ) {
+        this.props.setPlayState(false)
+      }
+      if (
+        this.props.setPlayState !== undefined &&
+        // this.props.isPlayDone &&
+        this.props.setIsSingleMode !== undefined
+      ) {
+        this.props.setPlayState(false)
+        this.props.setIsSingleMode(true)
+      }
+      this.props.setShowPlaylistTracks(true)
+    } else {
+      this.props.setPlayingStatus("ended", undefined)
+    }
+  }
+
+  onClick = (e: MouseEvent): void => {
+    if (this.rotator) {
+      const { left, width } = this.rotator.getBoundingClientRect()
 
       if (e.clientX - left < width / 2) {
         let x = rotValue + rotStep
@@ -272,164 +340,61 @@ class Music extends React.PureComponent<Props, State> {
         }
       }
     }
-    // @ts-ignore
-    this.rotator!.onmousewheel = (e: WheelEvent) => {
-      let x = rotValue + (e.deltaY / 100) * rotStep // деление на 100, чтобы исключить фактор влияния deltaY на шаг изменения угла, сделать зависимым шаг исключительно от величины step
+  }
 
-      if (x <= this.rotMin) {
-        this.setVolValue(0)
-        this.setState({
-          rotatorVal: 0,
-        })
-        this.setState({ volTrack: 0 })
-        this.props.setOldVolValue(0)
-      } else if (x > this.rotMax) {
-        this.setVolValue(100)
-        this.setState({
-          rotatorVal: 100,
-        })
-        this.setState({ volTrack: 1 })
-        this.props.setOldVolValue(1)
-      } else {
-        this.setVolValue(x)
-        this.setState({
-          rotatorVal: x,
-        })
-        this.setState({ volTrack: +x / 100 })
-        this.props.setOldVolValue(+(x / 100).toFixed(2))
-      }
-
-      e.preventDefault()
-    }
-
-    if (this.isFirefox) {
-      // установка специфической инструкции для Firefox, который не поддерживает стандартную onmousewheel
-      this.rotator!.onwheel = (e: WheelEvent) => {
-        let x = rotValue + (e.deltaY / 3) * rotStep // деление на 3, чтобы исключить фактор влияния deltaY(в фаерфокс, deltaY == 3) на шаг изменения угла, сделать зависимым шаг исключительно от величины step
-
-        if (x <= this.rotMin) {
-          this.setVolValue(0)
-          this.setState({
-            rotatorVal: 0,
-          })
-          this.setState({ volTrack: 0 })
-          this.props.setOldVolValue(0)
-        } else if (x > this.rotMax) {
-          this.setVolValue(100)
-          this.setState({
-            rotatorVal: 100,
-          })
-          this.setState({ volTrack: 1 })
-          this.props.setOldVolValue(1)
-        } else {
-          this.setVolValue(x)
-          this.setState({
-            rotatorVal: x,
-          })
-          this.setState({ volTrack: +x / 100 })
-          this.props.setOldVolValue(+(x / 100).toFixed(2))
-        }
-
-        e.preventDefault()
-      }
-    }
-
-    this.rotator!.ondragstart = function () {
-      // функция запрещает захват картинки по mousedown левой клавишы мыши
-      return false
-    }
-    this.playerSlide!.ondragstart = function () {
-      return false
+  onChange = (e: Event): void => {
+    const target = e.target as HTMLInputElement
+    if (this.audioTrack1) {
+      this.audioTrack1.currentTime = +target.value
     }
   }
 
-  componentDidUpdate() {
-    this.audioTrack1!.loop = this.state.volLoopValue
-    if (this.state.volTrack) {
-      this.audioTrack1!.volume = this.state.volTrack
+  onWheel = (e: WheelEvent): void => {
+    /*
+     ** деление на 3, чтобы исключить фактор влияния deltaY(в фаерфокс, deltaY == 3) на шаг изменения угла,
+     ** сделать зависимым шаг исключительно от величины step
+     ** деление на 100, чтобы исключить фактор влияния deltaY на шаг изменения угла, сделать зависимым шаг
+     ** исключительно от величины step
+     */
+    let x = rotValue + (e.deltaY / (this.isFirefox ? 3 : 100)) * rotStep
+    if (x <= this.rotMin) {
+      this.setVolValue(0)
+      this.setState({
+        rotatorVal: 0,
+      })
+      this.setState({ volTrack: 0 })
+      this.props.setOldVolValue(0)
+    } else if (x > this.rotMax) {
+      this.setVolValue(100)
+      this.setState({
+        rotatorVal: 100,
+      })
+      this.setState({ volTrack: 1 })
+      this.props.setOldVolValue(1)
+    } else {
+      this.setVolValue(x)
+      this.setState({
+        rotatorVal: x,
+      })
+      this.setState({ volTrack: +x / 100 })
+      this.props.setOldVolValue(+(x / 100).toFixed(2))
     }
-    if (this.state.rotatorVal <= 33) {
-      this.volLevContainer!.style.color = "teal"
-      this.volLevContainer!.style.textShadow = "1px -1px 4px #119600"
-    }
-    if (this.state.rotatorVal > 33) {
-      this.volLevContainer!.style.color = "#ffc107"
-      this.volLevContainer!.style.textShadow = "1px -1px 4px #FFB905"
-    }
-    if (this.state.rotatorVal > 66) {
-      this.volLevContainer!.style.color = "#dc3545"
-      this.volLevContainer!.style.textShadow = "1px -1px 4px #FF0511"
-    }
+    e.preventDefault()
   }
 
-  componentWillUnmount() {
-    this.audioTrack1!.removeEventListener("play", () => {
-      this.setState({ play: true })
-      this.rafId = requestAnimationFrame(this.tick)
-      this.canvasElement!.width = canvasW
-      this.canvasElement!.height = canvasH
-    })
-
-    this.audioTrack1!.removeEventListener("ended", () => {
-      this.setState({ play: false })
-      cancelAnimationFrame(this.rafId)
-      this.canvasElement!.width = 0
-      this.canvasElement!.height = 0
-      this.props.setShowMessage("")
-      this.props.setShowButton(true)
-      this.props.setTrackPlayState("")
-      if (this.props.arr?.length) {
-        this.props.setPlayingStatus(
-          // this.props.isPlayDone ||
-          this.props.isSingleMode ? "" : "ended",
-          {
-            i: this.props.index,
-            arr: this.props.arr,
-            buttons:
-              this.props.buttonsArr !== undefined &&
-              this.props.buttonsArr["prevButton"] !== null &&
-              this.props.buttonsArr["nextButton"] !== null
-                ? {
-                    prevButton: this.props.buttonsArr.prevButton,
-                    nextButton: this.props.buttonsArr.nextButton,
-                  }
-                : { prevButton: null, nextButton: null },
-            closeBtnRef: this.props.closeBtnRef,
-            playBtn: this.playBtn,
-          }
-        )
-        if (
-          this.props.setPlayState !== undefined &&
-          this.props.isSingleMode !== undefined
-        ) {
-          this.props.setPlayState(false)
-        }
-        if (
-          this.props.setPlayState !== undefined &&
-          // this.props.isPlayDone &&
-          this.props.setIsSingleMode !== undefined
-        ) {
-          this.props.setPlayState(false)
-          this.props.setIsSingleMode(true)
-        }
-
-        this.props.setShowPlaylistTracks(true)
-      } else {
-        this.props.setPlayingStatus("ended", undefined)
-      }
-    })
-
-    cancelAnimationFrame(this.rafId)
-    this.analyser.disconnect()
-    this.source.disconnect()
+  onRotatorDragStart = (): boolean => {
+    return false
+  }
+  onSlideDragStart = (): boolean => {
+    return false
   }
 
-  setVolValue = (newValue: number) => {
+  setVolValue = (newValue: number): void => {
     rotValue = newValue
     this.rotator!.style.transform = `rotate(${this.getRotAngle()}deg)`
   }
 
-  getRotAngle = () => (rotValue - this.rotMin) * this.ratio + this.rotMinAngle
+  getRotAngle = ():number => (rotValue - this.rotMin) * this.ratio + this.rotMinAngle
 
   animationLooper(canvas: HTMLCanvasElement): void {
     let width = (canvas.width = canvasW)
@@ -471,7 +436,9 @@ class Music extends React.PureComponent<Props, State> {
     )
     gradient.addColorStop(0, "white")
     gradient.addColorStop(1, "green")
-    ctx!.fillStyle = gradient
+    if (ctx) {
+      ctx.fillStyle = gradient
+    }
 
     let lineColor = ""
     if (frequency < 75) {
@@ -515,16 +482,20 @@ class Music extends React.PureComponent<Props, State> {
       lineColor = `rgb(${238},${230},${10})` // желтый
     }
 
-    ctx!.strokeStyle = lineColor
-    ctx!.lineWidth = bar_width
-    ctx!.beginPath()
-    ctx!.moveTo(x1, y1)
-    ctx!.lineTo(x2, y2)
-    ctx!.stroke()
-    ctx!.closePath()
+    if (ctx) {
+      ctx.strokeStyle = lineColor
+      ctx.lineWidth = bar_width
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.stroke()
+      ctx.closePath()
+    }
 
     if (!this.state.play) {
-      ctx!.clearRect(0, 0, canvas.width, canvas.height)
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+      }
     }
   }
 
@@ -534,30 +505,38 @@ class Music extends React.PureComponent<Props, State> {
     this.rafId = requestAnimationFrame(this.tick)
   }
 
-  togglePlay = () => {
+  togglePlay = (): void => {
     this.setState({ play: !this.state.play }, () => {
       if (this.state.play) {
         this.rafId = requestAnimationFrame(this.tick)
-        this.canvasElement!.width = canvasW
-        this.canvasElement!.height = canvasH
+        if (this.canvasElement) {
+          this.canvasElement.width = canvasW
+          this.canvasElement.height = canvasH
+        }
         if (this.props.setPlayState !== undefined) {
           this.props.setPlayState(true)
         }
-        this.audioTrack1!.play()
+        if (this.audioTrack1) {
+          this.audioTrack1.play()
+        }
       } else {
         cancelAnimationFrame(this.rafId)
-        this.canvasElement!.width = 0
-        this.canvasElement!.height = 0
-        this.audioTrack1!.pause()
+        if (this.canvasElement) {
+          this.canvasElement.width = 0
+          this.canvasElement.height = 0
+        }
+        if (this.audioTrack1) {
+          this.audioTrack1.pause()
+        }
       }
     })
   }
 
-  loopInstall = () => {
+  loopInstall = (): void => {
     this.setState({ volLoopValue: !this.state.volLoopValue })
   }
 
-  muteInstall = () => {
+  muteInstall = (): void => {
     if (!this.state.volMute) {
       this.props.setOldVolValue(+(this.state.rotatorVal / 100).toFixed(2))
       this.setVolValue(0)
@@ -612,13 +591,10 @@ class Music extends React.PureComponent<Props, State> {
   }
 
   trackOnTimeUpdate = (e: AudioElementEvent<HTMLAudioElement>): void => {
-    this.timeRanger!.value = e.target.currentTime.toFixed(0)
-
-    this.timeDivider(e.target.currentTime.toFixed(0))
-
-    this.timeRanger!.onchange = (e: any): void => {
-      this.audioTrack1!.currentTime = +e.target!.value
+    if (this.timeRanger) {
+      this.timeRanger.value = e.target.currentTime.toFixed(0)
     }
+    this.timeDivider(e.target.currentTime.toFixed(0))
   }
 
   render() {

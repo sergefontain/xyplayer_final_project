@@ -3,6 +3,10 @@ import { call, put, take } from "redux-saga/effects"
 import * as actions from "./../../store/actions"
 import { myFetch } from "./../../store/apiClient"
 
+/*
+** Service queries 
+*/
+
 const query = `
   query log($login: String!, $password: String!) {
     login(login: $login, password: $password)
@@ -16,6 +20,10 @@ const mutation = `
     }
   }
 `
+
+/*
+** Auth Sagas 
+*/
 
 export function* authSaga(): SagaIterator {
   while (true) {
@@ -35,7 +43,6 @@ export function* authSaga(): SagaIterator {
         })
         if (token === null) {
           throw new Error(`authSaga ERROR`)
-          // continue
         }
 
         localStorage.setItem("token", token)
@@ -58,7 +65,6 @@ export function* authSaga(): SagaIterator {
       localStorage.removeItem("createdPlaylistId")
       localStorage.removeItem("trackDeleteTrue")
     } catch (e) {
-      console.log(e)
       yield put(actions.authFailure(e))
     }
   }

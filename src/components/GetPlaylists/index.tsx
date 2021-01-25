@@ -152,6 +152,7 @@ const GetPlaylists: React.FC<Props> = ({
   const [searchInputValue, setSearchInputValue] = useState("")
   const [playState, setPlayState] = useState(false)
   const [isSingleMode, setIsSingleMode] = useState(true)
+  const [tracksPageNum, setTracksPageNum] = useState(0)
   const songRefsArr: Array<HTMLDivElement> = useMemo(() => [], [])
   const btnArr: Array<HTMLButtonElement> = useMemo(() => [], [])
   let searchInputRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
@@ -162,6 +163,7 @@ const GetPlaylists: React.FC<Props> = ({
   )
   let savedPlayState = useMemo(() => playState, [playState])
   let savedIsSingleMode = useMemo(() => isSingleMode, [isSingleMode])
+  let savedPagesCount = useMemo(() => tracksPageNum, [tracksPageNum])
 
   const imgCarousel = () => {
     let arrImg = [
@@ -180,31 +182,6 @@ const GetPlaylists: React.FC<Props> = ({
     return arrImg[chosenImgIndex > 0 ? chosenImgIndex : 0]
   }
   let nextImgToPlayer = imgCarousel()
-
-  console.log(
-    `turnOnTracksPlay: ${turnOnTracksPlay},
-orderPlay: ${orderPlay},
-playingStatus: ${playingStatus},
-savedPlayState: ${savedPlayState},
-savedIsSingleMode: ${savedIsSingleMode}
-
-creationStatus: ${creationStatus},
-
-turnOnShufflePlay: ${turnOnShufflePlay},
-currentTrackPage: ${currentTrackPage},
-alertStatus: ${alertStatus}
-`
-  )
-  //   console.log(`
-  // !playlistsFromRedux.length ||: ${!playlistsFromRedux.length},
-  // !playlistsFromRedux.PlaylistFind : ${!playlistsFromRedux.PlaylistFind?.length},
-  // !unsortedTracks.length ||: ${!unsortedTracks.length},
-  // pageLimitOverload ||: ${pageLimitOverload},
-  // queryStatus === "playlists_pending" ||: ${queryStatus === "playlists_pending"},
-  // !!(playingStatus || savedPlayState) ||: ${!!(playingStatus || savedPlayState)},
-  // queryStatus === "tracks_pending": ${queryStatus === "tracks_pending"},
-
-  // `)
 
   React.useEffect(() => {
     let searchInput: HTMLInputElement | null = searchInputRef.current
@@ -232,6 +209,9 @@ alertStatus: ${alertStatus}
     const getTracksPagesCount = () => localStorage.getItem("tracksPagesCount")
     const getTracksArrSize = () => localStorage.getItem("tracksArrSize")
     let pagesCount = getTracksPagesCount()
+    if (pagesCount) {
+      setTracksPageNum(+pagesCount)
+    }
 
     if (unsortedTracks.length) {
       let playlistSize: number | null | undefined = Number(getTracksArrSize())
@@ -256,7 +236,6 @@ alertStatus: ${alertStatus}
       setTracksforSaga(songRefsArr)
       setIsSingleMode(false)
     }
-
     if (orderPlay === "shuffle" && turnOnShufflePlay) {
       setTracksforSaga(songRefsArr)
       setIsSingleMode(false)
@@ -885,19 +864,31 @@ alertStatus: ${alertStatus}
           </Col>
         </Col>
         <Col className="d-flex flex-row justify-content-center">
-          <div className="w-100 d-flex justify-content-center">
+          <div className="w-100 d-flex justify-content-start ml-5">
             <input
+              disabled={
+                !!(playingStatus || savedPlayState) ||
+                queryStatus === "playlists_pending" ||
+                queryStatus === "tracks_pending"
+              }
               ref={searchInputRef}
-              className="form-control col-xs-9"
+              className="form-control col-xs-9 ml-4"
               id="searchPlaylist"
               name="searchPlaylist"
               type="search"
-              placeholder="Enter your search term and press <Enter>..."
+              placeholder={
+                playingStatus ||
+                savedPlayState ||
+                queryStatus === "playlists_pending" ||
+                queryStatus === "tracks_pending"
+                  ? ""
+                  : "Enter playlist name. Use <Enter> to search..."
+              }
               onChange={(e) => {
                 if (!(playingStatus || savedPlayState))
                   setSearchInputValue(e.target.value)
               }}
-              style={{ width: "28%" }}
+              style={{ width: "350px" }}
             />
           </div>
         </Col>
@@ -934,7 +925,8 @@ alertStatus: ${alertStatus}
                           queryStatus === "tracks_pending" ||
                           (savedIsSingleMode && !!playingStatus) ||
                           savedPlayState ||
-                          minTracksOnPage < MIN_TRACKS_ON_PAGE
+                          (savedPagesCount === 0 &&
+                            minTracksOnPage < MIN_TRACKS_ON_PAGE)
                     }
                     style={{
                       color:
@@ -945,7 +937,8 @@ alertStatus: ${alertStatus}
                         queryStatus === "tracks_pending" ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
-                        minTracksOnPage < MIN_TRACKS_ON_PAGE
+                        (savedPagesCount === 0 &&
+                          minTracksOnPage < MIN_TRACKS_ON_PAGE)
                           ? "gray"
                           : "",
                       pointerEvents:
@@ -956,7 +949,8 @@ alertStatus: ${alertStatus}
                         queryStatus === "tracks_pending" ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
-                        minTracksOnPage < MIN_TRACKS_ON_PAGE
+                        (savedPagesCount === 0 &&
+                          minTracksOnPage < MIN_TRACKS_ON_PAGE)
                           ? "none"
                           : "auto",
                     }}
@@ -1013,8 +1007,9 @@ alertStatus: ${alertStatus}
                           queryStatus === "tracks_pending" ||
                           (savedIsSingleMode && !!playingStatus) ||
                           savedPlayState ||
-                          maxTrackPages < MIN_TRACK_PAGES ||
-                          maxTrackPages > MAX_TRACK_PAGES
+                          (savedPagesCount === 0 &&
+                            (maxTrackPages < MIN_TRACK_PAGES ||
+                              maxTrackPages > MAX_TRACK_PAGES))
                     }
                     style={{
                       color:
@@ -1025,8 +1020,9 @@ alertStatus: ${alertStatus}
                         queryStatus === "tracks_pending" ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
-                        maxTrackPages < MIN_TRACK_PAGES ||
-                        maxTrackPages > MAX_TRACK_PAGES
+                        (savedPagesCount === 0 &&
+                          (maxTrackPages < MIN_TRACK_PAGES ||
+                            maxTrackPages > MAX_TRACK_PAGES))
                           ? "gray"
                           : "",
                       pointerEvents:
@@ -1037,8 +1033,9 @@ alertStatus: ${alertStatus}
                         queryStatus === "tracks_pending" ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
-                        maxTrackPages < MIN_TRACK_PAGES ||
-                        maxTrackPages > MAX_TRACK_PAGES
+                        (savedPagesCount === 0 &&
+                          (maxTrackPages < MIN_TRACK_PAGES ||
+                            maxTrackPages > MAX_TRACK_PAGES))
                           ? "none"
                           : "auto",
                     }}

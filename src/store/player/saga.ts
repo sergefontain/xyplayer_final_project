@@ -11,6 +11,10 @@ let shuffleSummary: string[][] = []
 let shufflePages: any = {}
 let isLoopTrue = true
 
+/*
+** Service functions 
+*/
+
 const getTracksArrSize = () => localStorage.getItem("tracksArrSize")
 const getTracksPagesCount = () => localStorage.getItem("tracksPagesCount")
 // const getStopStatus = () => localStorage.getItem("stopLoopedPlay")
@@ -162,6 +166,11 @@ const chooseRandomTrack = (
     return { i: nextTrackIndex, origin }
   }
 }
+
+
+/*
+** Playback Sagas 
+*/
 
 export function* setTrackPlayStateSaga(): SagaIterator {
   while (true) {
