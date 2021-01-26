@@ -12,8 +12,8 @@ let shufflePages: any = {}
 let isLoopTrue = true
 
 /*
-** Service functions 
-*/
+ ** Service functions
+ */
 
 const getTracksArrSize = () => localStorage.getItem("tracksArrSize")
 const getTracksPagesCount = () => localStorage.getItem("tracksPagesCount")
@@ -167,10 +167,9 @@ const chooseRandomTrack = (
   }
 }
 
-
 /*
-** Playback Sagas 
-*/
+ ** Playback Sagas
+ */
 
 export function* setTrackPlayStateSaga(): SagaIterator {
   while (true) {
@@ -264,6 +263,7 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             let currPage = yield call(getTracksPagesCount)
             yield put(actions.setTrackPage(+currPage))
             yield put(actions.setPlayStateAction(""))
+            yield delay(100)
             // localStorage.removeItem("stopLoopedPlay")
             continue
           }
@@ -286,6 +286,7 @@ export function* setShuffleToPlaySaga(): SagaIterator {
                   i++
                 ) {
                   nextButton.click()
+                  yield delay(100)
                 }
               } else if (+pagesCount === maxPagesCount - 1) {
                 for (
@@ -294,20 +295,23 @@ export function* setShuffleToPlaySaga(): SagaIterator {
                   i++
                 ) {
                   prevButton.click()
+                  yield delay(100)
                 }
               } else {
                 if (Math.random() > 0.5) {
                   if (!pageFilled) {
                     nextButton.click()
+                    yield delay(100)
                   } else {
                     prevButton.click()
+                    yield delay(100)
                   }
                 } else {
                   prevButton.click()
+                  yield delay(100)
                 }
               }
 
-              yield delay(150)
               let currPage = yield call(getTracksPagesCount)
               yield put(actions.getNewShuffleTracksPageArr(currPage))
 
@@ -655,6 +659,7 @@ export function* setPlaylistToPlaySaga(): SagaIterator {
             let currPage = yield call(getTracksPagesCount)
             yield put(actions.setTrackPage(+currPage))
             yield put(actions.setPlayStateAction(""))
+            yield delay(100)
             // localStorage.removeItem("stopLoopedPlay")
             continue
           }
