@@ -917,40 +917,39 @@ const GetPlaylists: React.FC<Props> = ({
                     name="checkbox"
                     value={"inOrder"}
                     disabled={
-                      creationStatus
-                        ? true
-                        : !unsortedTracks.length ||
-                          !playlistIdOld ||
-                          queryStatus === "playlists_pending" ||
-                          queryStatus === "tracks_pending" ||
-                          (savedIsSingleMode && !!playingStatus) ||
-                          savedPlayState ||
-                          (savedPagesCount === 0 &&
-                            minTracksOnPage < MIN_TRACKS_ON_PAGE)
+                      creationStatus ||
+                      (savedPagesCount === 0 &&
+                        minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
+                      (savedIsSingleMode && !!playingStatus) ||
+                      savedPlayState ||
+                      !unsortedTracks.length ||
+                      !playlistIdOld ||
+                      queryStatus === "playlists_pending" ||
+                      queryStatus === "tracks_pending"
                     }
                     style={{
                       color:
                         creationStatus ||
+                        (savedPagesCount === 0 &&
+                          minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
+                        (savedIsSingleMode && !!playingStatus) ||
+                        savedPlayState ||
                         !unsortedTracks.length ||
                         !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
-                        queryStatus === "tracks_pending" ||
-                        (savedIsSingleMode && !!playingStatus) ||
-                        savedPlayState ||
-                        (savedPagesCount === 0 &&
-                          minTracksOnPage < MIN_TRACKS_ON_PAGE)
+                        queryStatus === "tracks_pending"
                           ? "gray"
                           : "",
                       pointerEvents:
                         creationStatus ||
+                        (savedPagesCount === 0 &&
+                          minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
+                        (savedIsSingleMode && !!playingStatus) ||
+                        savedPlayState ||
                         !unsortedTracks.length ||
                         !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
-                        queryStatus === "tracks_pending" ||
-                        (savedIsSingleMode && !!playingStatus) ||
-                        savedPlayState ||
-                        (savedPagesCount === 0 &&
-                          minTracksOnPage < MIN_TRACKS_ON_PAGE)
+                        queryStatus === "tracks_pending"
                           ? "none"
                           : "auto",
                     }}
@@ -999,43 +998,42 @@ const GetPlaylists: React.FC<Props> = ({
                     name="checkbox"
                     value={"shuffle"}
                     disabled={
-                      creationStatus
-                        ? true
-                        : !unsortedTracks.length ||
-                          !playlistIdOld ||
-                          queryStatus === "playlists_pending" ||
-                          queryStatus === "tracks_pending" ||
-                          (savedIsSingleMode && !!playingStatus) ||
-                          savedPlayState ||
-                          (savedPagesCount === 0 &&
-                            (maxTrackPages < MIN_TRACK_PAGES ||
-                              maxTrackPages > MAX_TRACK_PAGES))
+                      creationStatus ||
+                      (savedPagesCount === 0 &&
+                        (maxTrackPages < MIN_TRACK_PAGES ||
+                          maxTrackPages > MAX_TRACK_PAGES)) ||
+                      (savedIsSingleMode && !!playingStatus) ||
+                      savedPlayState ||
+                      !unsortedTracks.length ||
+                      !playlistIdOld ||
+                      queryStatus === "playlists_pending" ||
+                      queryStatus === "tracks_pending"
                     }
                     style={{
                       color:
                         creationStatus ||
+                        (savedPagesCount === 0 &&
+                          (maxTrackPages < MIN_TRACK_PAGES ||
+                            maxTrackPages > MAX_TRACK_PAGES)) ||
+                        (savedIsSingleMode && !!playingStatus) ||
+                        savedPlayState ||
                         !unsortedTracks.length ||
                         !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
-                        queryStatus === "tracks_pending" ||
-                        (savedIsSingleMode && !!playingStatus) ||
-                        savedPlayState ||
-                        (savedPagesCount === 0 &&
-                          (maxTrackPages < MIN_TRACK_PAGES ||
-                            maxTrackPages > MAX_TRACK_PAGES))
+                        queryStatus === "tracks_pending"
                           ? "gray"
                           : "",
                       pointerEvents:
                         creationStatus ||
+                        (savedPagesCount === 0 &&
+                          (maxTrackPages < MIN_TRACK_PAGES ||
+                            maxTrackPages > MAX_TRACK_PAGES)) ||
+                        (savedIsSingleMode && !!playingStatus) ||
+                        savedPlayState ||
                         !unsortedTracks.length ||
                         !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
-                        queryStatus === "tracks_pending" ||
-                        (savedIsSingleMode && !!playingStatus) ||
-                        savedPlayState ||
-                        (savedPagesCount === 0 &&
-                          (maxTrackPages < MIN_TRACK_PAGES ||
-                            maxTrackPages > MAX_TRACK_PAGES))
+                        queryStatus === "tracks_pending"
                           ? "none"
                           : "auto",
                     }}

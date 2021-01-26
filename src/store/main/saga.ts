@@ -858,8 +858,7 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
         fullLengthPlaylistsFilteredArr.push(playlistsPageArr)
 
         yield put(actions.getPlaylistsOk(arrToFront))
-    
-       
+
         const playlistIdNew = yield call(getPlaylistId)
         createdPlaylistId = playlistIdNew
         yield put(actions.getTracksReq(playlistIdNew))
@@ -1062,7 +1061,7 @@ export function* createPlaylistSaga(): SagaIterator {
       yield put(actions.getPlaylistsOk(limitedPlaylists))
 
       const newPlaylistId = limitedPlaylists.PlaylistFind[0]._id
-     
+
       localStorage.setItem("playlistId", `${newPlaylistId}`)
       yield put(actions.getTracksReq(newPlaylistId))
 
@@ -1438,6 +1437,9 @@ export function* playlistSearchSaga(): SagaIterator {
         localStorage.setItem("limitOverloaded", "yes")
         yield put(actions.setLimitOverloaded(true))
       }
+      const playlistIdOld = yield call(getPlaylistId)
+      yield put(actions.getTracksReq(playlistIdOld))
+      
       searchEnd = true
       const { payload: isSearchLineEmpty } = yield take(
         actions.updatePlaylistList
@@ -1519,6 +1521,8 @@ export function* playlistSearchSaga(): SagaIterator {
           localStorage.setItem("limitOverloaded", "yes")
           yield put(actions.setLimitOverloaded(true))
         }
+        const playlistIdOld = yield call(getPlaylistId)
+        yield put(actions.getTracksReq(playlistIdOld))
       }
     } catch (e) {
       throw new Error(`playlistSearchSaga FAIL! ${e}`)
