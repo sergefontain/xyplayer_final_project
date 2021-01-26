@@ -1393,6 +1393,12 @@ export function* playlistSearchSaga(): SagaIterator {
   while (true) {
     try {
       const { payload: searchQuery } = yield take(actions.setSearchQueryToSaga)
+      const createTrue = yield call(checkPlaylistCreated)
+      if (createTrue) {
+        localStorage.removeItem("playlistCreated")
+        yield put(actions.setCreatePlaylistStatus(false))
+        createdPlaylistId = ""
+      }
       yield put(actions.setSearchStatus("searching"))
 
       const authData = yield call(getToken)

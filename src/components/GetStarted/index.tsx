@@ -277,7 +277,8 @@ const GetStarted: React.FC<Props> = ({
                   <div className=" forForm">
                     <button
                       disabled={
-                        isUploadDone === "done" && namePlaylist && descPlaylist
+                        !(playingStatus === "playing" || isTrackPlay) &&
+                        (isUploadDone === "done" && namePlaylist && descPlaylist)
                           ? false
                           : true
                       }
@@ -285,6 +286,7 @@ const GetStarted: React.FC<Props> = ({
                       className="px-5 py-2 mb-3 rounded"
                       style={{
                         background:
+                        !(playingStatus === "playing" || isTrackPlay) &&
                           isUploadDone === "done" &&
                           namePlaylist &&
                           descPlaylist
