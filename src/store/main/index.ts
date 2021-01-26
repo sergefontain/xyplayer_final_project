@@ -24,6 +24,7 @@ const initialState: MainState = {
   currentTrackPage: 0,
   playlistIdOld: "",
   searchStatus: "",
+  clearStatus: false,
 }
 
 const mainReducer = (
@@ -31,6 +32,11 @@ const mainReducer = (
   action: MainAction
 ): MainState => {
   switch (action.type) {
+    case getType(actions.clearSearchLine):
+      return {
+        ...state,
+        clearStatus: true,
+      }
     case getType(actions.setSearchStatus):
       return {
         ...state,
@@ -100,11 +106,6 @@ const mainReducer = (
         ...state,
         queryStatus: "playlists_pending",
       }
-    // case getType(actions.setTracksPendingStatus):
-    //   return {
-    //     ...state,
-    //     queryStatus: "tracks_pending",
-    //   }
     case getType(actions.setPlaylistPage):
       return {
         ...state,

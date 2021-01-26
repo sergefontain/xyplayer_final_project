@@ -78,4 +78,5 @@ export interface MainState {
   currentTrackPage: number
   playlistIdOld: string
   searchStatus: string
+  clearStatus: boolean
 }

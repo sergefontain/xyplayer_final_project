@@ -76,6 +76,7 @@ const mapStateToProps = (state: RootState) => ({
   newArrRequest: state.play.newArrRequest,
   alertStatus: state.play.alertStatus,
   searchStatus: state.main.searchStatus,
+  clearStatus: state.main.clearStatus,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
@@ -143,16 +144,17 @@ const GetPlaylists: React.FC<Props> = ({
   setSearchQuery,
   updatePlaylist,
   searchStatus,
+  clearStatus,
 }) => {
   const [showButton, setShowButton] = useState(true)
   const [showMessage, setShowMessage] = useState("")
   // const [isPlayDone, setIsPlayDone] = useState(false)
   const [maxTrackPages, setMaxTrackPages] = useState(4)
   const [minTracksOnPage, setMinTracksOnPage] = useState(4)
-  const [searchInputValue, setSearchInputValue] = useState("")
   const [playState, setPlayState] = useState(false)
   const [isSingleMode, setIsSingleMode] = useState(true)
   const [tracksPageNum, setTracksPageNum] = useState(0)
+  const [searchValue, setSearchValue] = useState("")
   const songRefsArr: Array<HTMLDivElement> = useMemo(() => [], [])
   const btnArr: Array<HTMLButtonElement> = useMemo(() => [], [])
   let searchInputRef: React.MutableRefObject<HTMLInputElement | null> = React.useRef(
@@ -189,7 +191,7 @@ const GetPlaylists: React.FC<Props> = ({
     window.onkeyup = (e: KeyboardEvent) => {
       if (e.keyCode === 13) {
         if (!(playingStatus || savedPlayState)) {
-          setSearchQuery(new RegExp(searchInputValue))
+          setSearchQuery(new RegExp(searchValue))
         }
       }
     }
@@ -243,6 +245,9 @@ const GetPlaylists: React.FC<Props> = ({
     if (newArrRequest === pagesCount) {
       setNewShuffleTracksArr(songRefsArr)
     }
+    if (clearStatus) {
+      setSearchValue("")
+    }
   }, [
     orderPlay,
     setTracksforSaga,
@@ -255,6 +260,7 @@ const GetPlaylists: React.FC<Props> = ({
     newArrRequest,
     setNewShuffleTracksArr,
     unsortedTracks,
+    clearStatus,
   ])
 
   const SortableItemForPlaylist = SortableElement(
@@ -876,6 +882,7 @@ const GetPlaylists: React.FC<Props> = ({
               id="searchPlaylist"
               name="searchPlaylist"
               type="search"
+              value={searchValue}
               placeholder={
                 playingStatus ||
                 savedPlayState ||
@@ -885,8 +892,9 @@ const GetPlaylists: React.FC<Props> = ({
                   : "Enter playlist name. Use <Enter> to search..."
               }
               onChange={(e) => {
-                if (!(playingStatus || savedPlayState))
-                  setSearchInputValue(e.target.value)
+                if (!(playingStatus || savedPlayState)) {
+                  setSearchValue(e.target.value)
+                }
               }}
               style={{ width: "350px" }}
             />

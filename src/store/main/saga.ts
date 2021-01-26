@@ -1015,6 +1015,11 @@ export function* createPlaylistSaga(): SagaIterator {
         actions.createTracksArrayReq
       )
       yield put(actions.setPlaylistsPendingStatus())
+      yield put(actions.clearSearchLine())
+      if (searchEnd) {
+        localStorage.removeItem("limitOverloaded")
+        yield put(actions.setLimitOverloaded(false))
+      }
       const { payload: data } = yield take(actions.createPlaylistReq)
 
       const transitRes = yield call(tracksPreparingToUpload, transitTracksData)
@@ -1439,7 +1444,7 @@ export function* playlistSearchSaga(): SagaIterator {
       }
       const playlistIdOld = yield call(getPlaylistId)
       yield put(actions.getTracksReq(playlistIdOld))
-      
+
       searchEnd = true
       const { payload: isSearchLineEmpty } = yield take(
         actions.updatePlaylistList
