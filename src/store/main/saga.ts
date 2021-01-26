@@ -750,6 +750,9 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
           fullLengthPlaylistsFilteredArr.push(playlistsPageArr)
 
           yield put(actions.getPlaylistsOk(arrToFront))
+
+          const playlistIdOld = yield call(getPlaylistId)
+          yield put(actions.getTracksReq(playlistIdOld))
         } else {
           const checkTrue = yield call(checkLimitOverLoad)
           if (checkTrue) {

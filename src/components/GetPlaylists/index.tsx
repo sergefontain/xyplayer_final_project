@@ -200,6 +200,7 @@ const GetPlaylists: React.FC<Props> = ({
       if (e.data === null) {
         if (!(playingStatus || savedPlayState)) {
           updatePlaylist(true)
+          setSearchValue("")
         }
       }
     }
