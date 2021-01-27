@@ -163,6 +163,6 @@ export const setTracksPendingStatus = createAction(
   "main/SET_TRACKS_PENDING_STATUS"
 )()
 export const setSearchQueryToSaga = createAction("main/SET_SEARCH_QUERY_TO_SAGA")<RegExp>()
-export const updatePlaylistList = createAction("main/UPDATE_PLAYLIST_LIST")<boolean>()
+export const updatePlaylistList = createAction("main/UPDATE_PLAYLIST_LIST")<string | null>()
 export const setSearchStatus = createAction("main/SET_SEARCH_STATUS")<string>()
 export const clearSearchLine = createAction("main/CLEAR_SEARCH_LINE")()

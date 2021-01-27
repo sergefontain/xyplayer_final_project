@@ -188,7 +188,7 @@ const GetPlaylists: React.FC<Props> = ({
   React.useEffect(() => {
     let searchInput: HTMLInputElement | null = searchInputRef.current
 
-    window.onkeyup = (e: KeyboardEvent) => {
+    const onKeyupHandler = (e: KeyboardEvent) => {
       if (e.keyCode === 13) {
         if (!(playingStatus || savedPlayState)) {
           setSearchQuery(new RegExp(searchValue))
@@ -196,21 +196,32 @@ const GetPlaylists: React.FC<Props> = ({
       }
     }
 
-    const handler = (e: any) => {
+    const onInputHandler = (e: any) => {
       if (e.data === null) {
+        console.log("#")
         if (!(playingStatus || savedPlayState)) {
-          updatePlaylist(true)
           setSearchValue("")
         }
       }
+      if (e.data !== "") {
+        if (!(playingStatus || savedPlayState)) {
+          updatePlaylist(e.data)
+        }
+      }
     }
-    searchInput?.addEventListener("input", handler)
-    return () => searchInput?.removeEventListener("input", handler)
+
+    searchInput?.addEventListener("input", onInputHandler)
+    window.addEventListener("keyup", onKeyupHandler)
+    return () => {
+      searchInput?.removeEventListener("input", onInputHandler)
+      window.removeEventListener("keyup", onKeyupHandler)
+    }
   })
 
   React.useEffect(() => {
     const getTracksPagesCount = () => localStorage.getItem("tracksPagesCount")
     const getTracksArrSize = () => localStorage.getItem("tracksArrSize")
+
     let pagesCount = getTracksPagesCount()
     if (pagesCount) {
       setTracksPageNum(+pagesCount)

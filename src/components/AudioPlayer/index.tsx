@@ -139,11 +139,6 @@ class Music extends React.PureComponent<Props, State> {
 
     this.ratio =
       (this.rotMaxAngle - this.rotMinAngle) / (this.rotMax - this.rotMin)
-
-    this.trackOnTimeUpdate = this.trackOnTimeUpdate.bind(this)
-    this.timeDivider = this.timeDivider.bind(this)
-    this.loopInstall = this.loopInstall.bind(this)
-    this.muteInstall = this.muteInstall.bind(this)
   }
 
   componentDidMount() {
