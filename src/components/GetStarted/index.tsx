@@ -63,6 +63,7 @@ const GetStarted: React.FC<Props> = ({
         document.getElementsByClassName("dzu-previewButton")
       )
       closeButtonArr.map((button: any) => button.click())
+      setIsFormFilled(false)
     }
   }, [
     isUploadDone,

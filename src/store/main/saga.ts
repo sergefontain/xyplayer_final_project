@@ -1029,6 +1029,7 @@ export function* createPlaylistSaga(): SagaIterator {
         yield put(actions.setLimitOverloaded(false))
       }
       const { payload: data } = yield take(actions.createPlaylistReq)
+      console.log("🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data", data)
 
       const transitRes = yield call(tracksPreparingToUpload, transitTracksData)
       const tracksServerInfo = yield call(allTracks, transitRes)
@@ -1072,13 +1073,12 @@ export function* createPlaylistSaga(): SagaIterator {
       yield put(actions.setTrackPage(0))
 
       yield put(actions.getPlaylistsOk(limitedPlaylists))
+      yield put(actions.createPlaylistSuccess())
 
       const newPlaylistId = limitedPlaylists.PlaylistFind[0]._id
 
       localStorage.setItem("playlistId", `${newPlaylistId}`)
       yield put(actions.getTracksReq(newPlaylistId))
-
-      yield put(actions.createPlaylistSuccess())
     } catch (e) {
       yield put(actions.createTracksArrayFail())
       yield put(actions.createPlaylistFailure())
