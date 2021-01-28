@@ -1475,6 +1475,11 @@ export function* playlistSearchSaga(): SagaIterator {
       } else {
         const authData = yield call(getToken)
         yield put(actions.getPlaylistsReq())
+        const checkTrue = yield call(checkLimitOverLoad)
+        if (checkTrue) {
+          localStorage.removeItem("limitOverloaded")
+          yield put(actions.setLimitOverloaded(false))
+        }
         const allPlaylists = yield call(
           myFetch,
           queryPlaylistsCount,
