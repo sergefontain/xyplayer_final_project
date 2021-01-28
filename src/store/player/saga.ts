@@ -242,8 +242,6 @@ export function* setShuffleToPlaySaga(): SagaIterator {
       setIsLoopTrue(true)
       if (isStartSuccess) {
         do {
-          const tracksArrSize = yield call(getTracksArrSize)
-          const pagesCount = yield call(getTracksPagesCount)
           console.log("local SHUFFLE loop start")
           const {
             payload: playingStatus,
@@ -256,6 +254,11 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             },
           } = yield take(actions.setPlayingStatus)
 
+          console.log("playingStatus", playingStatus)
+          const tracksArrSize = yield call(getTracksArrSize)
+          const pagesCount = yield call(getTracksPagesCount)
+          console.log("playingStatus after", pagesCount, tracksArrSize)
+
           if (playingStatus === "closed") {
             yield put(actions.setTurnOnShufflePlay(false))
             setIsLoopTrue(false)
@@ -263,52 +266,95 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             let currPage = yield call(getTracksPagesCount)
             yield put(actions.setTrackPage(+currPage))
             yield put(actions.setPlayStateAction(""))
+            iterCount = 0
+            pastPage = ""
+            pageFilled = 0
+            shufflePageChosenTracks = []
+            shuffleSummary = []
+            shufflePages = {}
             yield delay(100)
             // localStorage.removeItem("stopLoopedPlay")
             continue
           }
 
           if (playingStatus === "ended") {
+            console.log('playingStatus === "ended", 1')
             let maxPagesCount = Math.ceil(tracksArrSize / arr.length)
 
             if (iterCount < arr.length) {
+              console.log("iterCount < arr.length, 1")
               closeBtn.click()
               yield take(actions.setShowPlaylistTracks)
+              yield delay(50)
 
               if (+pagesCount === 0) {
-                for (
-                  let i = 0;
-                  i <
-                  Math.ceil(
-                    Math.random() *
-                      (maxPagesCount - 1 - (pageFilled ? pageFilled : 0))
-                  );
-                  i++
-                ) {
+                console.log("pagesCount === 0, 1")
+
+                let randomVar = Math.ceil(
+                  Math.random() *
+                    (maxPagesCount - 1 - (pageFilled ? pageFilled : 0))
+                )
+
+                console.log(
+                  "randomVar",
+                  randomVar,
+                  maxPagesCount - 1 - (pageFilled ? pageFilled : 0)
+                )
+                for (let i = 0; i < randomVar; i++) {
+                  console.log(
+                    "playingStatus === 'ended', pagesCount === 0, start"
+                  )
                   nextButton.click()
-                  yield delay(100)
+                  // yield delay(200)
+                  console.log(
+                    "playingStatus === 'ended', pagesCount === 0, end"
+                  )
                 }
               } else if (+pagesCount === maxPagesCount - 1) {
-                for (
-                  let i = 0;
-                  i < Math.ceil(Math.random() * maxPagesCount);
-                  i++
-                ) {
+                console.log("pagesCount === maxPagesCount - 1, 1")
+                let randomVar = Math.ceil(Math.random() * maxPagesCount)
+                console.log("randomVar", randomVar, maxPagesCount - 1)
+
+                for (let i = 0; i < randomVar; i++) {
+                  console.log(
+                    "playingStatus === 'ended', pagesCount === maxPagesCount - 1, start"
+                  )
                   prevButton.click()
-                  yield delay(100)
+                  // yield delay(200)
+                  console.log(
+                    "playingStatus === 'ended', pagesCount === maxPagesCount - 1, end"
+                  )
                 }
               } else {
                 if (Math.random() > 0.5) {
                   if (!pageFilled) {
+                    console.log(
+                      "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() > 0.5, !pageFilled, start"
+                    )
                     nextButton.click()
-                    yield delay(100)
+                    // yield delay(50)
+                    console.log(
+                      "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() > 0.5, !pageFilled, end"
+                    )
                   } else {
+                    console.log(
+                      "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() > 0.5, pageFilled, start"
+                    )
                     prevButton.click()
-                    yield delay(100)
+                    // yield delay(50)
+                    console.log(
+                      "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() > 0.5, pageFilled, end"
+                    )
                   }
                 } else {
+                  console.log(
+                    "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() < 0.5, start"
+                  )
                   prevButton.click()
-                  yield delay(100)
+                  // yield delay(50)
+                  console.log(
+                    "playingStatus === 'ended', pagesCount !== maxPagesCount - 1 && pagesCount !== 0, Math.random() < 0.5, end"
+                  )
                 }
               }
 
@@ -385,7 +431,7 @@ export function* setShuffleToPlaySaga(): SagaIterator {
               shufflePages,
               pageFilled
             )
-            // console.log("nextPage", nextPage)
+            console.log("nextPage, pagesCount", nextPage, pagesCount)
 
             if (nextPage === true) {
               iterCount = 0
@@ -447,37 +493,49 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             switch (pagesCount) {
               case "0":
                 if (nextPage === 0) {
+                  console.log('case "0", nextPage === 0', "start")
                   pastPage = pagesCount
+                  console.log('case "0", nextPage === 0', "end")
                 }
                 for (let i = 0; i < nextPage; i++) {
+                  console.log('case "0", nextPage !== 0', "start")
                   pastPage = pagesCount
                   nextButton.click()
                   yield delay(100)
+                  console.log('case "0", nextPage !== 0', "end")
                 }
                 break
               case "1":
                 switch (nextPage) {
                   case 0:
                     for (let i = 0; i < +pagesCount; i++) {
+                      console.log('case "1", nextPage === 0', "start")
                       pastPage = pagesCount
                       prevButton.click()
                       yield delay(100)
+                      console.log('case "1", nextPage === 0', "end")
                     }
                     break
                   case 1:
+                    console.log('case "1", nextPage === 1', "start")
                     pastPage = pagesCount
+                    console.log('case "1", nextPage === 1', "end")
                     break
                   case 2:
                     for (let i = +pagesCount; i < nextPage; i++) {
+                      console.log('case "1", nextPage === 2', "start")
                       pastPage = pagesCount
                       nextButton.click()
                       yield delay(100)
+                      console.log('case "1", nextPage === 2', "end")
                     }
                     break
                   case 3:
                     for (let i = +pagesCount; i < nextPage; i++) {
+                      console.log('case "1", nextPage === 3', "start")
                       nextButton.click()
                       yield delay(100)
+                      console.log('case "1", nextPage === 3', "end")
                     }
                     break
                 }
@@ -486,37 +544,49 @@ export function* setShuffleToPlaySaga(): SagaIterator {
                 switch (nextPage) {
                   case 0:
                     for (let i = nextPage; i < +pagesCount; i++) {
+                      console.log('case "2", nextPage === 0', "start")
                       pastPage = pagesCount
                       prevButton.click()
                       yield delay(100)
+                      console.log('case "2", nextPage === 0', "end")
                     }
                     break
                   case 1:
                     for (let i = nextPage; i < +pagesCount; i++) {
+                      console.log('case "2", nextPage === 1', "start")
                       pastPage = pagesCount
                       prevButton.click()
                       yield delay(100)
+                      console.log('case "2", nextPage === 1', "end")
                     }
                     break
                   case 2:
+                    console.log('case "2", nextPage === 2', "start")
                     pastPage = pagesCount
+                    console.log('case "2", nextPage === 2', "end")
                     break
                   case 3:
                     for (let i = +pagesCount; i < nextPage; i++) {
+                      console.log('case "2", nextPage === 3', "start")
                       pastPage = pagesCount
                       nextButton.click()
                       yield delay(100)
+                      console.log('case "2", nextPage === 3', "end")
                     }
                     break
                 }
                 break
               case "3":
                 if (nextPage === 3) {
+                  console.log('case "3", nextPage === 3', "start")
                   pastPage = pagesCount
+                  console.log('case "3", nextPage === 3', "end")
                 }
                 for (let i = nextPage; i < +pagesCount; i++) {
+                  console.log('case "3", nextPage === 0', "start")
                   prevButton.click()
                   yield delay(100)
+                  console.log('case "3", nextPage === 0', "end")
                 }
                 break
             }
