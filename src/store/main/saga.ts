@@ -655,9 +655,9 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
   while (true) {
     try {
       yield take(actions.prevPlaylistPage)
-      if (pagesCount === 0 && queryNum !== 0) {
-        queryNum = queryNum - 1
-        pagesCount = queryMaxSize - 1
+      if (searchEnd) {
+        pagesCount = pagesCount - 1
+        maxSearchPagesCount = maxSearchPagesCount + 1
 
         yield put(actions.prevPlaylistPage())
         yield put(actions.getPlaylistsReq())
@@ -676,89 +676,20 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
             fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
           )
         )
+
         yield put(
           actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
         )
         yield put(actions.getTracksOk())
+
       } else {
-        pagesCount = pagesCount - 1
-        maxSearchPagesCount = maxSearchPagesCount + 1
+        if (pagesCount === 0 && queryNum !== 0) {
+          queryNum = queryNum - 1
+          pagesCount = queryMaxSize - 1
 
-        yield put(actions.prevPlaylistPage())
-        yield put(actions.getPlaylistsReq())
+          yield put(actions.prevPlaylistPage())
+          yield put(actions.getPlaylistsReq())
 
-        const authData = yield call(getToken)
-        const allPlaylists = yield call(
-          myFetch,
-          queryPlaylistsCount,
-          {
-            query: JSON.stringify([
-              {
-                name: { $nin: [null, ""] },
-                "tracks.0": { $exists: true },
-              },
-              {},
-            ]),
-          },
-          { headers: { Authorization: `Bearer ${authData}` } }
-        )
-        const oldPlaylistslength = yield call(getPlaylistCommonLength)
-
-        if (
-          pagesCount === 0 &&
-          queryNum === 0 &&
-          allPlaylists.PlaylistCount > oldPlaylistslength
-        ) {
-          const checkTrue = yield call(checkLimitOverLoad)
-          if (checkTrue) {
-            yield put(actions.setLimitOverloaded(false))
-            localStorage.removeItem("limitOverloaded")
-          }
-          yield put(actions.setPlaylistPageLength(allPlaylists.PlaylistCount))
-          localStorage.setItem(
-            "playlistCommonLength",
-            `${allPlaylists.PlaylistCount}`
-          )
-
-          const dowloadedPlaylists = yield call(
-            myFetch,
-            queryPlaylists,
-            {
-              query: JSON.stringify([
-                {
-                  name: { $nin: [null, ""] },
-                  "tracks.0": { $exists: true },
-                },
-                {
-                  sort: [{ name: playlistsSortRule }],
-                  skip: [0],
-                  limit: [QUERY_PLAYLIST_LIMIT],
-                },
-              ]),
-            },
-            { headers: { Authorization: `Bearer ${authData}` } }
-          )
-
-          const { arr, limitedArr: arrToFront } = yield call(
-            preparingPlaylistsArrToPagination,
-            dowloadedPlaylists.PlaylistFind
-          )
-
-          savedPlaylistSortRule = playlistsSortRule
-          fullLengthPlaylistsFilteredArr = []
-          playlistsQueriesArr = []
-          playlistsQueriesArr.push(arr)
-
-          yield put(actions.setPlaylistPage(0))
-          playlistsPageArr = []
-          playlistsPageArr.push(arrToFront)
-          fullLengthPlaylistsFilteredArr.push(playlistsPageArr)
-
-          yield put(actions.getPlaylistsOk(arrToFront))
-
-          const playlistIdOld = yield call(getPlaylistId)
-          yield put(actions.getTracksReq(playlistIdOld))
-        } else {
           const checkTrue = yield call(checkLimitOverLoad)
           if (checkTrue) {
             yield put(actions.setLimitOverloaded(false))
@@ -768,7 +699,6 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
             applyPlaylistSortRule,
             fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
           )
-
           yield put(
             actions.getPlaylistsOk(
               fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
@@ -778,9 +708,107 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
             actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
           )
           yield put(actions.getTracksOk())
+        } else {
+          pagesCount = pagesCount - 1
+          maxSearchPagesCount = maxSearchPagesCount + 1
+
+          yield put(actions.prevPlaylistPage())
+          yield put(actions.getPlaylistsReq())
+
+          const authData = yield call(getToken)
+          const allPlaylists = yield call(
+            myFetch,
+            queryPlaylistsCount,
+            {
+              query: JSON.stringify([
+                {
+                  name: { $nin: [null, ""] },
+                  "tracks.0": { $exists: true },
+                },
+                {},
+              ]),
+            },
+            { headers: { Authorization: `Bearer ${authData}` } }
+          )
+          const oldPlaylistslength = yield call(getPlaylistCommonLength)
+
+          if (
+            pagesCount === 0 &&
+            queryNum === 0 &&
+            allPlaylists.PlaylistCount > oldPlaylistslength
+          ) {
+            const checkTrue = yield call(checkLimitOverLoad)
+            if (checkTrue) {
+              yield put(actions.setLimitOverloaded(false))
+              localStorage.removeItem("limitOverloaded")
+            }
+            yield put(actions.setPlaylistPageLength(allPlaylists.PlaylistCount))
+            localStorage.setItem(
+              "playlistCommonLength",
+              `${allPlaylists.PlaylistCount}`
+            )
+
+            const dowloadedPlaylists = yield call(
+              myFetch,
+              queryPlaylists,
+              {
+                query: JSON.stringify([
+                  {
+                    name: { $nin: [null, ""] },
+                    "tracks.0": { $exists: true },
+                  },
+                  {
+                    sort: [{ name: playlistsSortRule }],
+                    skip: [0],
+                    limit: [QUERY_PLAYLIST_LIMIT],
+                  },
+                ]),
+              },
+              { headers: { Authorization: `Bearer ${authData}` } }
+            )
+
+            const { arr, limitedArr: arrToFront } = yield call(
+              preparingPlaylistsArrToPagination,
+              dowloadedPlaylists.PlaylistFind
+            )
+
+            savedPlaylistSortRule = playlistsSortRule
+            fullLengthPlaylistsFilteredArr = []
+            playlistsQueriesArr = []
+            playlistsQueriesArr.push(arr)
+
+            yield put(actions.setPlaylistPage(0))
+            playlistsPageArr = []
+            playlistsPageArr.push(arrToFront)
+            fullLengthPlaylistsFilteredArr.push(playlistsPageArr)
+
+            yield put(actions.getPlaylistsOk(arrToFront))
+
+            const playlistIdOld = yield call(getPlaylistId)
+            yield put(actions.getTracksReq(playlistIdOld))
+          } else {
+            const checkTrue = yield call(checkLimitOverLoad)
+            if (checkTrue) {
+              yield put(actions.setLimitOverloaded(false))
+              localStorage.removeItem("limitOverloaded")
+            }
+            yield call(
+              applyPlaylistSortRule,
+              fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
+            )
+
+            yield put(
+              actions.getPlaylistsOk(
+                fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
+              )
+            )
+            yield put(
+              actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
+            )
+            yield put(actions.getTracksOk())
+          }
         }
       }
-
       // console.log(fullLengthPlaylistsFilteredArr)
       // console.log(playlistsQueriesArr)
       // console.log(playlistsPageArr)
@@ -798,11 +826,12 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
     try {
       yield take(actions.nextPlaylistPage)
 
-      searchEnd = false
-      if (!searchEnd) {
+      const checkTrue = yield call(checkLimitOverLoad)
+      if (checkTrue) {
         localStorage.removeItem("limitOverloaded")
         yield put(actions.setLimitOverloaded(false))
       }
+
       const createTrue = yield call(checkPlaylistCreated)
       if (createTrue) {
         localStorage.removeItem("playlistCreated")
@@ -887,116 +916,153 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
         )
         yield call(applyPlaylistSortRule, nextSlice)
 
-        if (
-          queryNum * QUERY_PLAYLIST_LIMIT + QUERY_PLAYLIST_LIMIT <
-          playlistCommonLength
-        ) {
-          if (pagesCount * PAGE_LIMIT_PLAYLIST < QUERY_PLAYLIST_LIMIT) {
-            if (
-              playlistsPageArr.length === pagesCount &&
-              !checkArrIncludesNextSlice(
-                fullLengthPlaylistsFilteredArr,
-                nextSlice
-              )
-            ) {
-              playlistsPageArr.push(nextSlice)
-              fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
-            }
-
-            yield put(actions.getPlaylistsOk(nextSlice))
-          } else if (
-            pagesCount * PAGE_LIMIT_PLAYLIST ===
-            QUERY_PLAYLIST_LIMIT
+        if (maxSearchPagesCount >= 0 && searchEnd) {
+          if (
+            !checkArrIncludesNextSlice(
+              fullLengthPlaylistsFilteredArr,
+              nextSlice
+            )
           ) {
-            queryNum = queryNum + 1
-            if (playlistsQueriesArr.length === queryNum) {
-              const dowloadedPlaylists = yield call(
-                myFetch,
-                queryPlaylists,
-                {
-                  query: JSON.stringify([
-                    {
-                      name: { $nin: [null, ""] },
-                      "tracks.0": { $exists: true },
-                    },
-                    {
-                      sort: [{ name: savedPlaylistSortRule }],
-                      skip: [queryNum * QUERY_PLAYLIST_LIMIT],
-                      limit: [QUERY_PLAYLIST_LIMIT],
-                    },
-                  ]),
-                },
-                { headers: { Authorization: `Bearer ${authData}` } }
+            playlistsPageArr.push(nextSlice)
+            fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+            if (!maxSearchPagesCount) {
+              localStorage.setItem("limitOverloaded", "yes")
+              yield put(actions.setLimitOverloaded(true))
+            }
+            yield put(actions.getPlaylistsOk(nextSlice))
+            yield put(
+              actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
+            )
+            yield put(actions.getTracksOk())
+          } else {
+            yield call(
+              applyPlaylistSortRule,
+              fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
+            )
+            yield put(
+              actions.getPlaylistsOk(
+                fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
               )
-
-              const { arr, limitedArr: arrToFront } = yield call(
-                preparingPlaylistsArrToPagination,
-                dowloadedPlaylists.PlaylistFind
-              )
-
-              localStorage.setItem("playlistParticleLength", `${arr.length}`)
-
-              if (arr.length <= PAGE_LIMIT_PLAYLIST) {
-                localStorage.setItem("limitOverloaded", "yes")
-                yield put(actions.setLimitOverloaded(true))
-              }
-
-              playlistsQueriesArr.push(arr)
-              pagesCount = 0
-              playlistsPageArr = []
-              playlistsPageArr.push(arrToFront)
-              fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
-
-              yield put(actions.getPlaylistsOk(arrToFront))
-            } else {
-              pagesCount = 0
-              if (playlistsQueriesArr[queryNum].length <= PAGE_LIMIT_PLAYLIST) {
-                localStorage.setItem("limitOverloaded", "yes")
-                yield put(actions.setLimitOverloaded(true))
-              }
-              yield put(
-                actions.getPlaylistsOk(
-                  fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
-                )
-              )
+            )
+            yield put(
+              actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
+            )
+            yield put(actions.getTracksOk())
+            if (!maxSearchPagesCount) {
+              localStorage.setItem("limitOverloaded", "yes")
+              yield put(actions.setLimitOverloaded(true))
             }
           }
         } else {
           if (
-            pagesCount * PAGE_LIMIT_PLAYLIST + PAGE_LIMIT_PLAYLIST <
-            +playlistParticleLength
+            queryNum * QUERY_PLAYLIST_LIMIT + QUERY_PLAYLIST_LIMIT <
+            playlistCommonLength
           ) {
-            if (
-              playlistsPageArr.length === pagesCount &&
-              !checkArrIncludesNextSlice(
-                fullLengthPlaylistsFilteredArr,
-                nextSlice
-              )
+            if (pagesCount * PAGE_LIMIT_PLAYLIST < QUERY_PLAYLIST_LIMIT) {
+              if (
+                playlistsPageArr.length === pagesCount &&
+                !checkArrIncludesNextSlice(
+                  fullLengthPlaylistsFilteredArr,
+                  nextSlice
+                )
+              ) {
+                playlistsPageArr.push(nextSlice)
+                fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+              }
+
+              yield put(actions.getPlaylistsOk(nextSlice))
+            } else if (
+              pagesCount * PAGE_LIMIT_PLAYLIST ===
+              QUERY_PLAYLIST_LIMIT
             ) {
-              playlistsPageArr.push(nextSlice)
-              fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+              queryNum = queryNum + 1
+
+              if (playlistsQueriesArr.length === queryNum) {
+                const dowloadedPlaylists = yield call(
+                  myFetch,
+                  queryPlaylists,
+                  {
+                    query: JSON.stringify([
+                      {
+                        name: { $nin: [null, ""] },
+                        "tracks.0": { $exists: true },
+                      },
+                      {
+                        sort: [{ name: savedPlaylistSortRule }],
+                        skip: [queryNum * QUERY_PLAYLIST_LIMIT],
+                        limit: [QUERY_PLAYLIST_LIMIT],
+                      },
+                    ]),
+                  },
+                  { headers: { Authorization: `Bearer ${authData}` } }
+                )
+
+                const { arr, limitedArr: arrToFront } = yield call(
+                  preparingPlaylistsArrToPagination,
+                  dowloadedPlaylists.PlaylistFind
+                )
+
+                localStorage.setItem("playlistParticleLength", `${arr.length}`)
+
+                if (arr.length <= PAGE_LIMIT_PLAYLIST) {
+                  localStorage.setItem("limitOverloaded", "yes")
+                  yield put(actions.setLimitOverloaded(true))
+                }
+
+                playlistsQueriesArr.push(arr)
+                pagesCount = 0
+                playlistsPageArr = []
+                playlistsPageArr.push(arrToFront)
+                fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+
+                yield put(actions.getPlaylistsOk(arrToFront))
+              } else {
+                pagesCount = 0
+                if (
+                  playlistsQueriesArr[queryNum].length <= PAGE_LIMIT_PLAYLIST
+                ) {
+                  localStorage.setItem("limitOverloaded", "yes")
+                  yield put(actions.setLimitOverloaded(true))
+                }
+                yield put(
+                  actions.getPlaylistsOk(
+                    fullLengthPlaylistsFilteredArr[queryNum][pagesCount]
+                  )
+                )
+              }
             }
-            yield put(actions.getPlaylistsOk(nextSlice))
           } else {
             if (
-              playlistsPageArr.length === pagesCount &&
-              !checkArrIncludesNextSlice(
-                fullLengthPlaylistsFilteredArr,
-                nextSlice
-              )
+              pagesCount * PAGE_LIMIT_PLAYLIST + PAGE_LIMIT_PLAYLIST <
+              +playlistParticleLength
             ) {
-              playlistsPageArr.push(nextSlice)
-              fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+              if (
+                playlistsPageArr.length === pagesCount &&
+                !checkArrIncludesNextSlice(
+                  fullLengthPlaylistsFilteredArr,
+                  nextSlice
+                )
+              ) {
+                playlistsPageArr.push(nextSlice)
+                fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+              }
+              yield put(actions.getPlaylistsOk(nextSlice))
+            } else {
+              if (
+                playlistsPageArr.length === pagesCount &&
+                !checkArrIncludesNextSlice(
+                  fullLengthPlaylistsFilteredArr,
+                  nextSlice
+                )
+              ) {
+                playlistsPageArr.push(nextSlice)
+                fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+              }
+              localStorage.setItem("limitOverloaded", "yes")
+              yield put(actions.setLimitOverloaded(true))
+              yield put(actions.getPlaylistsOk(nextSlice))
             }
-            localStorage.setItem("limitOverloaded", "yes")
-            yield put(actions.setLimitOverloaded(true))
-            yield put(actions.getPlaylistsOk(nextSlice))
           }
-        }
-
-        if (!maxSearchPagesCount) {
-          localStorage.setItem("limitOverloaded", "yes")
-          yield put(actions.setLimitOverloaded(true))
         }
 
         // console.log(fullLengthPlaylistsFilteredArr)
@@ -1029,7 +1095,10 @@ export function* createPlaylistSaga(): SagaIterator {
         yield put(actions.setLimitOverloaded(false))
       }
       const { payload: data } = yield take(actions.createPlaylistReq)
-      console.log("🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data", data)
+      console.log(
+        "🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data",
+        data
+      )
 
       const transitRes = yield call(tracksPreparingToUpload, transitTracksData)
       const tracksServerInfo = yield call(allTracks, transitRes)
@@ -1071,14 +1140,13 @@ export function* createPlaylistSaga(): SagaIterator {
       localStorage.setItem("tracksPagesCount", `${trackPagesCount}`)
       tracksPageArr = []
       yield put(actions.setTrackPage(0))
-
       yield put(actions.getPlaylistsOk(limitedPlaylists))
-      yield put(actions.createPlaylistSuccess())
 
       const newPlaylistId = limitedPlaylists.PlaylistFind[0]._id
 
       localStorage.setItem("playlistId", `${newPlaylistId}`)
       yield put(actions.getTracksReq(newPlaylistId))
+      yield put(actions.createPlaylistSuccess())
     } catch (e) {
       yield put(actions.createTracksArrayFail())
       yield put(actions.createPlaylistFailure())
@@ -1434,7 +1502,7 @@ export function* playlistSearchSaga(): SagaIterator {
               {
                 sort: [{ name: playlistsSortRule }],
                 skip: [0],
-                limit: [QUERY_PLAYLIST_LIMIT],
+                // limit: [QUERY_PLAYLIST_LIMIT],
               },
             ]),
           },
@@ -1444,7 +1512,6 @@ export function* playlistSearchSaga(): SagaIterator {
           preparingPlaylistsArrToPagination,
           dowloadedPlaylists.PlaylistFind
         )
-
         maxSearchPagesCount = Math.ceil(arr.length / arrToFront.length) - 1
 
         savedPlaylistSortRule = playlistsSortRule
@@ -1458,7 +1525,7 @@ export function* playlistSearchSaga(): SagaIterator {
         playlistsPageArr = []
         playlistsPageArr[pagesCount] = arrToFront
         fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
-
+        
         const playlistModifiedLength = yield call(getPlaylistModifiedLength)
         if (PAGE_LIMIT_PLAYLIST < playlistModifiedLength) {
           yield put(actions.getPlaylistsOk(arrToFront))
@@ -1524,6 +1591,7 @@ export function* playlistSearchSaga(): SagaIterator {
           preparingPlaylistsArrToPagination,
           dowloadedPlaylists.PlaylistFind
         )
+
         maxSearchPagesCount = 0
 
         savedPlaylistSortRule = playlistsSortRule
@@ -1537,6 +1605,7 @@ export function* playlistSearchSaga(): SagaIterator {
         playlistsPageArr = []
         playlistsPageArr[pagesCount] = arrToFront
         fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
+
         yield put(actions.setSearchStatus(""))
         const playlistModifiedLength = yield call(getPlaylistModifiedLength)
 
