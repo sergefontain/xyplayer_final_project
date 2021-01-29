@@ -976,11 +976,6 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
             ) {
               queryNum = queryNum + 1
 
-              if (!createdPlaylistId) {
-                yield put(actions.setCreatePlaylistStatus(false))
-                createdPlaylistId = ""
-              }
-
               if (playlistsQueriesArr.length === queryNum) {
                 const dowloadedPlaylists = yield call(
                   myFetch,
