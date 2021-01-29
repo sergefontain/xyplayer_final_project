@@ -443,7 +443,6 @@ class Music extends React.PureComponent<Props, State> {
     let lineColor = ""
     if (frequency < 75) {
       if (this.state.play) {
-        // if (this.props.playToProps) {
         i = i + 1
         if (i / 10 < 40) {
           lineColor = `rgb(${238},${10},${230}` // ярко-фиолетовый

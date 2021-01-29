@@ -254,7 +254,7 @@ const GetPlaylists: React.FC<Props> = ({
       setTracksforSaga(songRefsArr)
       setIsSingleMode(false)
     }
-    console.log("newArrRequest,pagesCount", newArrRequest, pagesCount)
+    // console.log("newArrRequest,pagesCount", newArrRequest, pagesCount)
     if (newArrRequest === pagesCount) {
       setNewShuffleTracksArr(songRefsArr)
     }
