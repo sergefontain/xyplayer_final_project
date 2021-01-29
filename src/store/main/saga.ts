@@ -681,7 +681,6 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
           actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
         )
         yield put(actions.getTracksOk())
-
       } else {
         if (pagesCount === 0 && queryNum !== 0) {
           queryNum = queryNum - 1
@@ -977,6 +976,11 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
             ) {
               queryNum = queryNum + 1
 
+              if (!createdPlaylistId) {
+                yield put(actions.setCreatePlaylistStatus(false))
+                createdPlaylistId = ""
+              }
+
               if (playlistsQueriesArr.length === queryNum) {
                 const dowloadedPlaylists = yield call(
                   myFetch,
@@ -1095,10 +1099,10 @@ export function* createPlaylistSaga(): SagaIterator {
         yield put(actions.setLimitOverloaded(false))
       }
       const { payload: data } = yield take(actions.createPlaylistReq)
-      console.log(
-        "🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data",
-        data
-      )
+      // console.log(
+      //   "🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data",
+      //   data
+      // )
 
       const transitRes = yield call(tracksPreparingToUpload, transitTracksData)
       const tracksServerInfo = yield call(allTracks, transitRes)
@@ -1525,7 +1529,7 @@ export function* playlistSearchSaga(): SagaIterator {
         playlistsPageArr = []
         playlistsPageArr[pagesCount] = arrToFront
         fullLengthPlaylistsFilteredArr[queryNum] = playlistsPageArr
-        
+
         const playlistModifiedLength = yield call(getPlaylistModifiedLength)
         if (PAGE_LIMIT_PLAYLIST < playlistModifiedLength) {
           yield put(actions.getPlaylistsOk(arrToFront))
