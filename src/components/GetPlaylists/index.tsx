@@ -198,7 +198,6 @@ const GetPlaylists: React.FC<Props> = ({
 
     const onInputHandler = (e: any) => {
       if (e.data === null) {
-        console.log("#")
         if (!(playingStatus || savedPlayState)) {
           setSearchValue("")
         }

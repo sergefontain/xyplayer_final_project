@@ -28,6 +28,7 @@ let tracksArrSize = 0
 let searchEnd = false
 let maxSearchPagesCount = 0
 let createdPlaylistId = ""
+let playlistOld = ""
 
 interface User {
   acl: Array<any>
@@ -449,10 +450,17 @@ export function* getTracksSaga(): SagaIterator {
         if (!createTrue) {
           localStorage.setItem("playlistId", `${playlistId}`)
         }
-
-        if (createdPlaylistId !== playlistId && createdPlaylistId !== "") {
-          yield put(actions.setCreatePlaylistStatus(false))
-          createdPlaylistId = ""
+        if (createdPlaylistId !== playlistId && createdPlaylistId) {
+          if (!searchEnd) {
+            yield put(actions.setCreatePlaylistStatus(false))
+            createdPlaylistId = ""
+          } else {
+            if (playlistOld !== playlistId && playlistOld) {
+              yield put(actions.setCreatePlaylistStatus(false))
+              createdPlaylistId = ""
+              playlistOld = ""
+            }
+          }
         }
 
         const authData = yield call(getToken)
@@ -1141,9 +1149,10 @@ export function* createPlaylistSaga(): SagaIterator {
       yield put(actions.setTrackPage(0))
       yield put(actions.getPlaylistsOk(limitedPlaylists))
 
-      const newPlaylistId = limitedPlaylists.PlaylistFind[0]._id
+      const newPlaylistId: string = limitedPlaylists.PlaylistFind[0]._id
+      createdPlaylistId = newPlaylistId
 
-      localStorage.setItem("playlistId", `${newPlaylistId}`)
+      localStorage.setItem("playlistId", newPlaylistId)
       yield put(actions.getTracksReq(newPlaylistId))
       yield put(actions.createPlaylistSuccess())
     } catch (e) {
@@ -1483,8 +1492,6 @@ export function* playlistSearchSaga(): SagaIterator {
         const createTrue = yield call(checkPlaylistCreated)
         if (createTrue) {
           localStorage.removeItem("playlistCreated")
-          yield put(actions.setCreatePlaylistStatus(false))
-          createdPlaylistId = ""
         }
         yield put(actions.setSearchStatus("searching"))
         const authData = yield call(getToken)
@@ -1535,6 +1542,7 @@ export function* playlistSearchSaga(): SagaIterator {
         }
         const playlistIdOld = yield call(getPlaylistId)
         yield put(actions.getTracksReq(playlistIdOld))
+        playlistOld = playlistIdOld
 
         searchEnd = true
         continue
