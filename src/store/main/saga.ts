@@ -450,10 +450,12 @@ export function* getTracksSaga(): SagaIterator {
         if (!createTrue) {
           localStorage.setItem("playlistId", `${playlistId}`)
         }
+        // console.log("createdPlaylistId, playlistId, playlistOld", createdPlaylistId, playlistId, playlistOld)
         if (createdPlaylistId !== playlistId && createdPlaylistId) {
           if (!searchEnd) {
             yield put(actions.setCreatePlaylistStatus(false))
             createdPlaylistId = ""
+            playlistOld = ""
           } else {
             if (playlistOld !== playlistId && playlistOld) {
               yield put(actions.setCreatePlaylistStatus(false))
@@ -904,7 +906,6 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
         yield put(actions.getPlaylistsOk(arrToFront))
 
         const playlistIdNew = yield call(getPlaylistId)
-        createdPlaylistId = playlistIdNew
         yield put(actions.getTracksReq(playlistIdNew))
       } else {
         pagesCount = pagesCount + 1
@@ -1081,6 +1082,8 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
           actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
         )
         yield put(actions.getTracksOk())
+        // const playlistIdNew = yield call(getPlaylistId)
+        // yield put(actions.getTracksReq(playlistIdNew))
       }
     } catch (e) {
       yield put(actions.getPlaylistsTracksFail(e))
@@ -1096,17 +1099,14 @@ export function* createPlaylistSaga(): SagaIterator {
         actions.createTracksArrayReq
       )
       yield put(actions.setPlaylistsPendingStatus())
-      yield put(actions.clearSearchLine())
+      yield put(actions.clearSearchLine(true))
+     
       if (searchEnd) {
         localStorage.removeItem("limitOverloaded")
         yield put(actions.setLimitOverloaded(false))
       }
       const { payload: data } = yield take(actions.createPlaylistReq)
-      // console.log(
-      //   "🚀 ~ file: saga.ts ~ line 1032 ~ function*createPlaylistSaga ~ data",
-      //   data
-      // )
-
+  
       const transitRes = yield call(tracksPreparingToUpload, transitTracksData)
       const tracksServerInfo = yield call(allTracks, transitRes)
       yield put(actions.createTracksArrayOk(tracksServerInfo))
@@ -1151,9 +1151,13 @@ export function* createPlaylistSaga(): SagaIterator {
 
       const newPlaylistId: string = limitedPlaylists.PlaylistFind[0]._id
       createdPlaylistId = newPlaylistId
+      playlistOld = newPlaylistId
 
       localStorage.setItem("playlistId", newPlaylistId)
       yield put(actions.getTracksReq(newPlaylistId))
+      
+      const searchUndone = yield take(actions.clearSearchLine)
+      yield put(actions.clearSearchLine(searchUndone))
       yield put(actions.createPlaylistSuccess())
     } catch (e) {
       yield put(actions.createTracksArrayFail())
@@ -1508,7 +1512,6 @@ export function* playlistSearchSaga(): SagaIterator {
               {
                 sort: [{ name: playlistsSortRule }],
                 skip: [0],
-                // limit: [QUERY_PLAYLIST_LIMIT],
               },
             ]),
           },

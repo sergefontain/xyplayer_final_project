@@ -100,6 +100,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
       setNewShuffleTracksArr: actions.setNewShuffleTracksPageArr,
       setSearchQuery: actions.setSearchQueryToSaga,
       updatePlaylist: actions.updatePlaylistList,
+      setClearFalse: actions.clearSearchLine
     },
     dispatch
   )
@@ -145,6 +146,7 @@ const GetPlaylists: React.FC<Props> = ({
   updatePlaylist,
   searchStatus,
   clearStatus,
+  setClearFalse,
 }) => {
   const [showButton, setShowButton] = useState(true)
   const [showMessage, setShowMessage] = useState("")
@@ -232,6 +234,7 @@ const GetPlaylists: React.FC<Props> = ({
         let maxPagesCount = Math.ceil(playlistSize / unsortedTracks.length)
         setMaxTrackPages(maxPagesCount)
         setMinTracksOnPage(unsortedTracks.length)
+        setClearFalse(false)
       }
     }
 
@@ -260,6 +263,7 @@ const GetPlaylists: React.FC<Props> = ({
     if (clearStatus) {
       setSearchValue("")
     }
+   
   }, [
     orderPlay,
     setTracksforSaga,
@@ -273,6 +277,7 @@ const GetPlaylists: React.FC<Props> = ({
     setNewShuffleTracksArr,
     unsortedTracks,
     clearStatus,
+    setClearFalse,
   ])
 
   const SortableItemForPlaylist = SortableElement(

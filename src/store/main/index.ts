@@ -35,7 +35,7 @@ const mainReducer = (
     case getType(actions.clearSearchLine):
       return {
         ...state,
-        clearStatus: true,
+        clearStatus: action.payload,
       }
     case getType(actions.setSearchStatus):
       return {
