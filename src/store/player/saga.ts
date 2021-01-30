@@ -291,15 +291,21 @@ export function* setShuffleToPlaySaga(): SagaIterator {
                   Math.random() *
                     (maxPagesCount - 1 - (pageFilled ? pageFilled : 0))
                 )
-
-                for (let i = 0; i < randomVar; i++) {
-                  nextButton.click()
+                if (randomVar === 0) {
+                  isCurrentPagetheSamePageToPlay = true
+                } else {
+                  for (let i = 0; i < randomVar; i++) {
+                    nextButton.click()
+                  }
                 }
               } else if (+pagesCount === maxPagesCount - 1) {
                 let randomVar = Math.ceil(Math.random() * maxPagesCount)
-
-                for (let i = 0; i < randomVar; i++) {
-                  prevButton.click()
+                if (randomVar === 0) {
+                  isCurrentPagetheSamePageToPlay = true
+                } else {
+                  for (let i = 0; i < randomVar; i++) {
+                    prevButton.click()
+                  }
                 }
               } else {
                 if (Math.random() > 0.5) {
@@ -313,13 +319,21 @@ export function* setShuffleToPlaySaga(): SagaIterator {
                 }
               }
 
-              yield delay(50)
+              if (isCurrentPagetheSamePageToPlay) {
+                console.log("!!!!!!!!!!!!!!!!")
+                yield put(actions.getCurrShuffleTracksPageArr(true))
+              }
+
               let currPage = yield call(getTracksPagesCount)
               yield put(actions.getNewShuffleTracksPageArr(currPage))
 
               const { payload: newArr } = yield take(
                 actions.setNewShuffleTracksPageArr
               )
+              if (isCurrentPagetheSamePageToPlay) {
+                isCurrentPagetheSamePageToPlay = false
+                yield put(actions.getCurrShuffleTracksPageArr(false))
+              }
 
               const isObjHasArr = yield call(
                 checkObjIncludesNextArr,
