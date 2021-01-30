@@ -13,6 +13,7 @@ export interface PlayerState {
   playState: string
   playingMode: string
   newArrRequest: string
+  currArrRequest: boolean
   alertStatus: boolean
 }
 

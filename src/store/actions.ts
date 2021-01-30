@@ -75,6 +75,7 @@ export const setNewShuffleTracksPageArr = createAction(
   "player/SET_NEW_SHUFFLE_TRACKS_PAGE_ARR"
 )<Array<HTMLDivElement | null>>()
 export const showAlert = createAction("player/SHOW_ALERT")<boolean>()
+export const getCurrShuffleTracksPageArr = createAction("player/GET_CURRENT_TRACKS_PAGE_ARRAY")<boolean>()
 
 // ./mainReducer
 export const getPlaylistsReq = createAction("main/GET_PLAYLISTS_REQUEST")()

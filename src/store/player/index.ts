@@ -14,6 +14,7 @@ const initialState: PlayerState = {
   playState: "",
   playingMode: "",
   newArrRequest: "",
+  currArrRequest: false,
   alertStatus: false,
 }
 
@@ -22,6 +23,8 @@ const playerReducer = (
   action: PlayerAction
 ): PlayerState => {
   switch (action.type) {
+    case getType(actions.getCurrShuffleTracksPageArr):
+      return { ...state, currArrRequest: action.payload }
     case getType(actions.showAlert):
       return { ...state, alertStatus: action.payload }
     case getType(actions.getNewShuffleTracksPageArr):

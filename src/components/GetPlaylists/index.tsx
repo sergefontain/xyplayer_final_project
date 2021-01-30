@@ -77,6 +77,7 @@ const mapStateToProps = (state: RootState) => ({
   alertStatus: state.play.alertStatus,
   searchStatus: state.main.searchStatus,
   clearStatus: state.main.clearStatus,
+  currArrRequest: state.play.currArrRequest,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
@@ -147,6 +148,7 @@ const GetPlaylists: React.FC<Props> = ({
   searchStatus,
   clearStatus,
   setClearFalse,
+  currArrRequest,
 }) => {
   const [showButton, setShowButton] = useState(true)
   const [showMessage, setShowMessage] = useState("")
@@ -256,10 +258,14 @@ const GetPlaylists: React.FC<Props> = ({
       setTracksforSaga(songRefsArr)
       setIsSingleMode(false)
     }
-    // console.log("newArrRequest,pagesCount", newArrRequest, pagesCount)
+
+    if(currArrRequest){
+      setNewShuffleTracksArr(songRefsArr)
+    }
     if (newArrRequest === pagesCount) {
       setNewShuffleTracksArr(songRefsArr)
     }
+
     if (clearStatus) {
       setSearchValue("")
     }
@@ -278,6 +284,7 @@ const GetPlaylists: React.FC<Props> = ({
     unsortedTracks,
     clearStatus,
     setClearFalse,
+    currArrRequest,
   ])
 
   const SortableItemForPlaylist = SortableElement(
