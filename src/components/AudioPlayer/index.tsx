@@ -27,9 +27,9 @@ type AudioElementEvent<T> = React.SyntheticEvent<HTMLAudioElement, Event> & {
 }
 
 interface TrackProps {
-  src: string
+  src: string | undefined
   title: string | undefined
-  originName: string
+  originName: string | undefined
   playState: boolean
   setShowButton: React.Dispatch<React.SetStateAction<boolean>>
   index?: number | undefined

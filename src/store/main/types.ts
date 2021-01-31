@@ -1,4 +1,3 @@
-
 import { ActionType } from "typesafe-actions"
 import * as actions from "../actions"
 
@@ -37,11 +36,12 @@ export interface Playlist {
   tracks: Array<Track>
 }
 export interface Track {
-  originalFileName: string
+  [x:string]: string | User | ID3 | Array<Playlist> | undefined
+  originalFileName?: string | undefined
   _id: string
-  url: string
+  url?: string | undefined
   owner: User
-  id3: ID3
+  id3?: ID3 | undefined
   playlists: Array<Playlist>
 }
 

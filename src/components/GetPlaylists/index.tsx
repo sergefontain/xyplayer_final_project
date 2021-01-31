@@ -101,7 +101,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
       setNewShuffleTracksArr: actions.setNewShuffleTracksPageArr,
       setSearchQuery: actions.setSearchQueryToSaga,
       updatePlaylist: actions.updatePlaylistList,
-      setClearFalse: actions.clearSearchLine
+      setClearFalse: actions.clearSearchLine,
     },
     dispatch
   )
@@ -259,7 +259,7 @@ const GetPlaylists: React.FC<Props> = ({
       setIsSingleMode(false)
     }
 
-    if(currArrRequest){
+    if (currArrRequest) {
       setNewShuffleTracksArr(songRefsArr)
     }
     if (newArrRequest === pagesCount) {
@@ -269,7 +269,6 @@ const GetPlaylists: React.FC<Props> = ({
     if (clearStatus) {
       setSearchValue("")
     }
-   
   }, [
     orderPlay,
     setTracksforSaga,
@@ -390,12 +389,14 @@ const GetPlaylists: React.FC<Props> = ({
                   display: "inline-block",
                 }}
               >
-                {track.id3.trackNumber}
+                {track.id3?.trackNumber}
               </div>
               <Player
-                src={track.url}
-                title={track.id3.title ? track.id3.title : undefined}
-                originName={track.originalFileName}
+                src={track.url ? track.url : undefined}
+                title={track.id3?.title ? track.id3?.title : undefined}
+                originName={
+                  track.originalFileName ? track.originalFileName : undefined
+                }
                 playState={savedPlayState}
                 setShowButton={setShowButton}
                 setShowMessage={setShowMessage}
@@ -508,12 +509,14 @@ const GetPlaylists: React.FC<Props> = ({
                   display: "inline-block",
                 }}
               >
-                {track.id3.trackNumber}
+                {track.id3?.trackNumber}
               </div>
               <Player
-                src={track.url}
-                title={track.id3.title ? track.id3.title : undefined}
-                originName={track.originalFileName}
+                src={track.url ? track.url : undefined}
+                title={track.id3?.title ? track.id3?.title : undefined}
+                originName={
+                  track.originalFileName ? track.originalFileName : undefined
+                }
                 playState={savedPlayState}
                 setShowButton={setShowButton}
                 setShowMessage={setShowMessage}

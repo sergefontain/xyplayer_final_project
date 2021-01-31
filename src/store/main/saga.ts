@@ -41,6 +41,10 @@ interface UserInfo {
   sub: User
 }
 
+interface FileObject {
+  fileObject: Array<File>
+}
+
 /**
  ** Service functions
  */
@@ -58,7 +62,19 @@ const checkPlaylistCreated = () => localStorage.getItem("playlistCreated")
 const checkTrackPageLimitOverload = () =>
   localStorage.getItem("trackPageLimitOverload")
 
-const allTracks = async (acceptedFiles: Array<any>) => {
+const tracksPreparingToUpload = (arr: Array<FileObject>) => {
+  let tracksArrToUpload = []
+  for (let obj of arr) {
+    for (let key in obj) {
+      if (key === "fileObject") {
+        tracksArrToUpload.push(obj[key])
+      }
+    }
+  }
+  return tracksArrToUpload
+}
+
+const allTracks = async (acceptedFiles: Array<File>) => {
   return await Promise.all(
     acceptedFiles.map(async (file: string | Blob) => {
       const body = new FormData()
@@ -76,19 +92,7 @@ const allTracks = async (acceptedFiles: Array<any>) => {
   )
 }
 
-const tracksPreparingToUpload = (arr: Array<any>) => {
-  let tracksArrToUpload = []
-  for (let obj of arr) {
-    for (let key in obj) {
-      if (key === "fileObject") {
-        tracksArrToUpload.push(obj[key])
-      }
-    }
-  }
-  return tracksArrToUpload
-}
-
-const infoPreparingToServer = (arr: Array<any>) => {
+const infoPreparingToServer = (arr: Array<Track>) => {
   for (let obj of arr) {
     for (let key in obj) {
       if (key === "url") {
@@ -99,7 +103,7 @@ const infoPreparingToServer = (arr: Array<any>) => {
   return arr
 }
 
-const infoPreparingToReUpload = (arr: Array<any>) => {
+const infoPreparingToReUpload = (arr: Array<Track>) => {
   for (let obj of arr) {
     for (let key in obj) {
       if (key === "originalFileName") {
@@ -182,8 +186,10 @@ const applyPlaylistSortRule = (playlistArr: Array<Playlist>) => {
 const preparingTracksArrToFront = (tracksArr: Array<Track>) => {
   return Object.values(
     tracksArr.reduce(
-      (sum, currentItem) =>
-        Object.assign(sum, { [currentItem.originalFileName]: currentItem }),
+      (sum, currentItem: { originalFileName?: Track["originalFileName"] }) =>
+        Object.assign(sum, {
+          [`${currentItem.originalFileName}`]: currentItem,
+        }),
       {}
     )
   )
@@ -600,7 +606,6 @@ export function* getTracksSaga(): SagaIterator {
         tracksPageArr = []
         yield put(actions.setTrackPage(0))
         tracksPageArr.push(limitedTracksArr)
-
 
         if (PAGE_LIMIT_TRACK >= tracksArrSize) {
           localStorage.setItem("trackPageLimitOverload", "yes")
