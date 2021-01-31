@@ -12,7 +12,7 @@ let shufflePages: any = {}
 let isLoopTrue = true
 let isCurrentPagetheSamePageToPlay = false
 
-/*
+/**
  ** Service functions
  */
 
@@ -68,8 +68,6 @@ const chooseRandomPage = (
     }
   }
 
-  // console.log("allowPagesArr", allowPagesArr)
-
   if (!allowPagesArr.length) {
     if (pageFilledCount) {
       for (let count = 0; count < maxPageCount - pageFilledCount; count++) {
@@ -113,8 +111,6 @@ const chooseRandomTrack = (
   arr: HTMLDivElement[],
   exceptionArr?: string[] | undefined
 ) => {
-  // console.log("arr", arr)
-  // console.log("exceptionArr", exceptionArr)
 
   let indexArr: number[] = []
   let allowArrIndex: number[] = []
@@ -153,14 +149,6 @@ const chooseRandomTrack = (
   let origin =
     allowNameArr[exceptionArr?.length ? nextTrackIndexToPlay : nextTrackIndex]
 
-  // console.log("allowArr", allowArr)
-  // console.log("disallowArr", disallowArr)
-  // console.log("allowArrIndex", allowArrIndex)
-  // console.log("allowNameArr", allowNameArr)
-  // console.log("nextTrackIndexToPlay", nextTrackIndexToPlay)
-  // console.log("nextTrackIndex", nextTrackIndex)
-  // console.log("origin", origin)
-
   if (disallowArr.length) {
     return { i: nextTrackIndexToPlay, origin }
   } else {
@@ -168,7 +156,7 @@ const chooseRandomTrack = (
   }
 }
 
-/*
+/**
  ** Playback Sagas
  */
 
@@ -224,7 +212,6 @@ export function* initializeShuffleSaga(): SagaIterator {
       } else {
         yield put(actions.setTurnOffShufflePlay(true))
         yield put(actions.setTrackOrderToPlay(""))
-        // localStorage.setItem("stopLoopedPlay", "stop")
         continue
       }
     } catch (e) {
@@ -272,7 +259,6 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             shuffleSummary = []
             shufflePages = {}
             yield delay(100)
-            // localStorage.removeItem("stopLoopedPlay")
             continue
           }
 
@@ -318,7 +304,6 @@ export function* setShuffleToPlaySaga(): SagaIterator {
               }
 
               if (isCurrentPagetheSamePageToPlay) {
-                console.log("!!!!!!!!!!!!!!!!")
                 yield put(actions.getCurrShuffleTracksPageArr(true))
               }
 
@@ -537,7 +522,6 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             const { payload: newArr } = yield take(
               actions.setNewShuffleTracksPageArr
             )
-            console.log("newArr", newArr)
             if (isCurrentPagetheSamePageToPlay) {
               isCurrentPagetheSamePageToPlay = false
               yield put(actions.getCurrShuffleTracksPageArr(false))
@@ -656,7 +640,6 @@ export function* setPlaylistToPlaySaga(): SagaIterator {
           } = yield take(actions.setPlayingStatus)
 
           if (playingStatus === "closed") {
-            console.log("!playingStatus")
             yield put(actions.setTurnOnTracksPlay(false))
             setIsLoopTrue(false)
             yield put(actions.setPlayingMode("single"))

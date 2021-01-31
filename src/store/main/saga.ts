@@ -41,7 +41,7 @@ interface UserInfo {
   sub: User
 }
 
-/*
+/**
  ** Service functions
  */
 const getToken = () => localStorage.getItem("token")
@@ -205,9 +205,9 @@ const checkArrIncludesNextSlice = (
   return result
 }
 
-/*
-** Service queries
-*/
+/**
+ ** Service queries
+ */
 
 const queryPlaylists = `
 query findPlaylists($query: String!){
@@ -300,9 +300,9 @@ mutation deleteTrack($playlist: PlaylistInput!){
 }
 `
 
-/*
-** Main Sagas
-*/
+/**
+ ** Main Sagas
+ */
 
 export function* getPlaylistsSaga(): SagaIterator {
   while (true) {
@@ -567,7 +567,6 @@ export function* getTracksSaga(): SagaIterator {
         yield take(actions.getPlaylistsOk)
         const authData = yield call(getToken)
         const checkTracksOverloadTrue = yield call(checkTrackPageLimitOverload)
-        console.log("checkTracksOverloadTrue",checkTracksOverloadTrue)
         if (checkTracksOverloadTrue) {
           yield put(actions.setTrackPageLimitOverloaded(false))
           localStorage.removeItem("trackPageLimitOverload")
