@@ -1223,6 +1223,7 @@ export function* deleteTrackSaga(): SagaIterator {
       } else {
         localStorage.removeItem("setTracksTrue")
         localStorage.removeItem("playlistId")
+        yield put(actions.getPlaylistIdOld(""))
         yield put(actions.clearSearchLine(true))
         const checkTrue = yield call(checkLimitOverLoad)
         if (checkTrue) {
@@ -1603,8 +1604,54 @@ export function* playlistSearchSaga(): SagaIterator {
           yield put(actions.setLimitOverloaded(true))
         }
         const playlistIdOld = yield call(getPlaylistId)
-        yield put(actions.getTracksReq(playlistIdOld))
-        playlistOld = playlistIdOld
+        if (playlistIdOld) {
+          yield put(actions.getTracksReq(playlistIdOld))
+          playlistOld = playlistIdOld
+        } else {
+          const tracks = yield call(
+            myFetch,
+            queryTracks,
+            {
+              query: JSON.stringify([
+                {},
+                {
+                  sort: [{ _id: -1 }],
+                  limit: [TRACKS_START_LIMIT],
+                },
+              ]),
+            },
+            { headers: { Authorization: `Bearer ${authData}` } }
+          )
+          const modifiedArrToFront = yield call(
+            preparingTracksArrToFront,
+            tracks.TrackFind
+          )
+
+          fullLengthTracksArr = modifiedArrToFront
+          tracksArrSize = modifiedArrToFront.length
+          localStorage.setItem("tracksArrSize", `${tracksArrSize}`)
+          const limitedTracksArr = modifiedArrToFront.slice(0, PAGE_LIMIT_TRACK)
+          trackPagesCount = 0
+          localStorage.setItem("tracksPagesCount", `${trackPagesCount}`)
+          tracksPageArr = []
+          yield put(actions.setTrackPage(0))
+          tracksPageArr.push(limitedTracksArr)
+
+          const checkTracksOverloadTrue = yield call(
+            checkTrackPageLimitOverload
+          )
+          if (checkTracksOverloadTrue) {
+            yield put(actions.setTrackPageLimitOverloaded(false))
+            localStorage.removeItem("trackPageLimitOverload")
+          }
+          if (PAGE_LIMIT_TRACK >= tracksArrSize) {
+            localStorage.setItem("trackPageLimitOverload", "yes")
+            yield put(actions.setTrackPageLimitOverloaded(true))
+          }
+
+          yield put(actions.createUnsortedTracksArr(limitedTracksArr))
+          yield put(actions.getTracksOk())
+        }
 
         searchEnd = true
         continue
@@ -1685,8 +1732,56 @@ export function* playlistSearchSaga(): SagaIterator {
           localStorage.setItem("limitOverloaded", "yes")
           yield put(actions.setLimitOverloaded(true))
         }
+        
         const playlistIdOld = yield call(getPlaylistId)
-        yield put(actions.getTracksReq(playlistIdOld))
+        if (playlistIdOld) {
+          yield put(actions.getTracksReq(playlistIdOld))
+          playlistOld = playlistIdOld
+        } else {
+          const tracks = yield call(
+            myFetch,
+            queryTracks,
+            {
+              query: JSON.stringify([
+                {},
+                {
+                  sort: [{ _id: -1 }],
+                  limit: [TRACKS_START_LIMIT],
+                },
+              ]),
+            },
+            { headers: { Authorization: `Bearer ${authData}` } }
+          )
+          const modifiedArrToFront = yield call(
+            preparingTracksArrToFront,
+            tracks.TrackFind
+          )
+
+          fullLengthTracksArr = modifiedArrToFront
+          tracksArrSize = modifiedArrToFront.length
+          localStorage.setItem("tracksArrSize", `${tracksArrSize}`)
+          const limitedTracksArr = modifiedArrToFront.slice(0, PAGE_LIMIT_TRACK)
+          trackPagesCount = 0
+          localStorage.setItem("tracksPagesCount", `${trackPagesCount}`)
+          tracksPageArr = []
+          yield put(actions.setTrackPage(0))
+          tracksPageArr.push(limitedTracksArr)
+
+          const checkTracksOverloadTrue = yield call(
+            checkTrackPageLimitOverload
+          )
+          if (checkTracksOverloadTrue) {
+            yield put(actions.setTrackPageLimitOverloaded(false))
+            localStorage.removeItem("trackPageLimitOverload")
+          }
+          if (PAGE_LIMIT_TRACK >= tracksArrSize) {
+            localStorage.setItem("trackPageLimitOverload", "yes")
+            yield put(actions.setTrackPageLimitOverloaded(true))
+          }
+
+          yield put(actions.createUnsortedTracksArr(limitedTracksArr))
+          yield put(actions.getTracksOk())
+        }
 
         searchEnd = false
       }

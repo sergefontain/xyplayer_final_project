@@ -953,36 +953,36 @@ const GetPlaylists: React.FC<Props> = ({
                     value={"inOrder"}
                     disabled={
                       creationStatus ||
+                      !playlistIdOld ||
                       (savedPagesCount === 0 &&
                         minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
                       (savedIsSingleMode && !!playingStatus) ||
                       savedPlayState ||
                       !unsortedTracks.length ||
-                      !playlistIdOld ||
                       queryStatus === "playlists_pending" ||
                       queryStatus === "tracks_pending"
                     }
                     style={{
                       color:
                         creationStatus ||
+                        !playlistIdOld ||
                         (savedPagesCount === 0 &&
                           minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
                         !unsortedTracks.length ||
-                        !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
                         queryStatus === "tracks_pending"
                           ? "gray"
                           : "",
                       pointerEvents:
                         creationStatus ||
+                        !playlistIdOld ||
                         (savedPagesCount === 0 &&
                           minTracksOnPage < MIN_TRACKS_ON_PAGE) ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
                         !unsortedTracks.length ||
-                        !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
                         queryStatus === "tracks_pending"
                           ? "none"
@@ -1034,39 +1034,39 @@ const GetPlaylists: React.FC<Props> = ({
                     value={"shuffle"}
                     disabled={
                       creationStatus ||
+                      !playlistIdOld ||
                       (savedPagesCount === 0 &&
                         (maxTrackPages < MIN_TRACK_PAGES ||
                           maxTrackPages > MAX_TRACK_PAGES)) ||
                       (savedIsSingleMode && !!playingStatus) ||
                       savedPlayState ||
                       !unsortedTracks.length ||
-                      !playlistIdOld ||
                       queryStatus === "playlists_pending" ||
                       queryStatus === "tracks_pending"
                     }
                     style={{
                       color:
                         creationStatus ||
+                        !playlistIdOld ||
                         (savedPagesCount === 0 &&
                           (maxTrackPages < MIN_TRACK_PAGES ||
                             maxTrackPages > MAX_TRACK_PAGES)) ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
                         !unsortedTracks.length ||
-                        !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
                         queryStatus === "tracks_pending"
                           ? "gray"
                           : "",
                       pointerEvents:
                         creationStatus ||
+                        !playlistIdOld ||
                         (savedPagesCount === 0 &&
                           (maxTrackPages < MIN_TRACK_PAGES ||
                             maxTrackPages > MAX_TRACK_PAGES)) ||
                         (savedIsSingleMode && !!playingStatus) ||
                         savedPlayState ||
                         !unsortedTracks.length ||
-                        !playlistIdOld ||
                         queryStatus === "playlists_pending" ||
                         queryStatus === "tracks_pending"
                           ? "none"
