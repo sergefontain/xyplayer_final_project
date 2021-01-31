@@ -206,8 +206,8 @@ const checkArrIncludesNextSlice = (
 }
 
 /*
- ** Service queries
- */
+** Service queries
+*/
 
 const queryPlaylists = `
 query findPlaylists($query: String!){
@@ -301,8 +301,8 @@ mutation deleteTrack($playlist: PlaylistInput!){
 `
 
 /*
- ** Main Sagas
- */
+** Main Sagas
+*/
 
 export function* getPlaylistsSaga(): SagaIterator {
   while (true) {
@@ -450,7 +450,7 @@ export function* getTracksSaga(): SagaIterator {
         if (!createTrue) {
           localStorage.setItem("playlistId", `${playlistId}`)
         }
-        // console.log("createdPlaylistId, playlistId, playlistOld", createdPlaylistId, playlistId, playlistOld)
+
         if (createdPlaylistId !== playlistId && createdPlaylistId) {
           if (!searchEnd) {
             yield put(actions.setCreatePlaylistStatus(false))
@@ -1089,8 +1089,6 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
           actions.createUnsortedTracksArr(tracksPageArr[trackPagesCount])
         )
         yield put(actions.getTracksOk())
-        // const playlistIdNew = yield call(getPlaylistId)
-        // yield put(actions.getTracksReq(playlistIdNew))
       }
     } catch (e) {
       yield put(actions.getPlaylistsTracksFail(e))

@@ -255,10 +255,8 @@ export function* setShuffleToPlaySaga(): SagaIterator {
             },
           } = yield take(actions.setPlayingStatus)
 
-          // console.log("playingStatus", playingStatus)
           const tracksArrSize = yield call(getTracksArrSize)
           const pagesCount = yield call(getTracksPagesCount)
-          // console.log("playingStatus after", pagesCount, tracksArrSize)
 
           if (playingStatus === "closed") {
             yield put(actions.setTurnOnShufflePlay(false))
