@@ -1208,11 +1208,11 @@ export function* createPlaylistSaga(): SagaIterator {
       createdPlaylistId = newPlaylistId
       playlistOld = newPlaylistId
 
-      localStorage.setItem("playlistId", newPlaylistId)
-      yield put(actions.getTracksReq(newPlaylistId))
-
       const searchUndone = yield take(actions.clearSearchLine)
       yield put(actions.clearSearchLine(searchUndone))
+
+      localStorage.setItem("playlistId", newPlaylistId)
+      yield put(actions.getTracksReq(newPlaylistId))
       yield put(actions.createPlaylistSuccess())
     } catch (e) {
       yield put(actions.createTracksArrayFail())
