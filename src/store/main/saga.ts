@@ -157,15 +157,7 @@ const preparingPlaylistsArrToPagination = (playlistsArr: Array<Playlist>) => {
     `${filteredTracksNullLength.length}`
   )
 
-  if (playlistsSortRule === 1) {
-    filteredTracksNullLength.sort((a, b) =>
-      a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-    )
-  } else {
-    filteredTracksNullLength.sort((a, b) =>
-      a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1
-    )
-  }
+  applyPlaylistSortRule(filteredTracksNullLength)
 
   const limitedArr = filteredTracksNullLength.slice(0, PAGE_LIMIT_PLAYLIST)
   return { arr: filteredTracksNullLength, limitedArr: limitedArr }
