@@ -171,8 +171,6 @@ const GetPlaylists: React.FC<Props> = ({
   let savedIsSingleMode = useMemo(() => isSingleMode, [isSingleMode])
   let savedPagesCount = useMemo(() => tracksPageNum, [tracksPageNum])
 
-  console.log("currentTrackPage", currentTrackPage)
-
   const imgCarousel = () => {
     let arrImg = [
       img01,
