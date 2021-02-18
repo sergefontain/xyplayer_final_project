@@ -1554,7 +1554,7 @@ export function* getPrevTrackPageSaga(): SagaIterator {
       yield take(actions.prevTrackPage)
       trackPagesCount = trackPagesCount - 1
       localStorage.setItem("tracksPagesCount", `${trackPagesCount}`)
-      yield put(actions.prevTrackPage())
+      yield put(actions.prevTrackPage(trackPagesCount))
 
       const checkTrue = yield call(checkTrackPageLimitOverload)
       if (checkTrue) {
@@ -1575,7 +1575,7 @@ export function* getNextTrackPageSaga(): SagaIterator {
       yield take(actions.nextTrackPage)
       trackPagesCount = trackPagesCount + 1
       localStorage.setItem("tracksPagesCount", `${trackPagesCount}`)
-      yield put(actions.nextTrackPage())
+      yield put(actions.nextTrackPage(trackPagesCount))
 
       const nextTracksArrSlice = fullLengthTracksArr.slice(
         trackPagesCount * PAGE_LIMIT_TRACK,

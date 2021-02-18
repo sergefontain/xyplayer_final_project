@@ -150,8 +150,8 @@ export const setTrackPageLimitOverloaded = createAction(
   "main/SET_TRACK_LIMIT_OVERLOAD"
 )<boolean>()
 
-export const prevTrackPage = createAction("main/PREV_TRACK_PAGE")()
-export const nextTrackPage = createAction("main/NEXT_TRACK_PAGE")()
+export const prevTrackPage = createAction("main/PREV_TRACK_PAGE")<number>()
+export const nextTrackPage = createAction("main/NEXT_TRACK_PAGE")<number>()
 export const setTrackPage = createAction("main/SET_TRACK_PAGE")<number>()
 
 export const getPlaylistIdOld = createAction(

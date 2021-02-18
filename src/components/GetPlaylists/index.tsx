@@ -171,6 +171,8 @@ const GetPlaylists: React.FC<Props> = ({
   let savedIsSingleMode = useMemo(() => isSingleMode, [isSingleMode])
   let savedPagesCount = useMemo(() => tracksPageNum, [tracksPageNum])
 
+  console.log("currentTrackPage", currentTrackPage)
+
   const imgCarousel = () => {
     let arrImg = [
       img01,
@@ -1014,7 +1016,7 @@ const GetPlaylists: React.FC<Props> = ({
                       !!(playingStatus === "playing" || savedPlayState) ||
                       queryStatus === "tracks_pending"
                     }
-                    onClick={prevTrackPage}
+                    onClick={() => prevTrackPage(currentTrackPage - 1)}
                     className="my-4 btn-danger rounded"
                     style={{ width: "min-content" }}
                     ref={(elem: HTMLButtonElement) => (btnArr[0] = elem)}
@@ -1127,7 +1129,7 @@ const GetPlaylists: React.FC<Props> = ({
                 !!(playingStatus === "playing" || savedPlayState) ||
                 queryStatus === "tracks_pending"
               }
-              onClick={nextTrackPage}
+              onClick={() => nextTrackPage(currentTrackPage + 1)}
               className="btn-danger rounded"
               ref={(elem: HTMLButtonElement) => (btnArr[1] = elem)}
             >

@@ -136,12 +136,12 @@ const mainReducer = (
     case getType(actions.prevTrackPage):
       return {
         ...state,
-        currentTrackPage: state.currentTrackPage - 1,
+        currentTrackPage: action.payload,
       }
     case getType(actions.nextTrackPage):
       return {
         ...state,
-        currentTrackPage: state.currentTrackPage + 1,
+        currentTrackPage: action.payload,
       }
     case getType(actions.setTrackPageLimitOverloaded):
       return {
