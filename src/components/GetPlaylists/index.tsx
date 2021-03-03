@@ -243,6 +243,8 @@ const GetPlaylists: React.FC<Props> = ({
     if (savedIsSingleMode) {
       if (playingStatus === "playing") {
         setPlayState(true)
+      } else if(!playingStatus){
+        setPlayState(false)
       }
     } else {
       if (playingMode === "single") {

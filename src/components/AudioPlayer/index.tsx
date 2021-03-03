@@ -268,6 +268,7 @@ class Music extends React.PureComponent<Props, State> {
     this.props.setTrackPlayState("")
 
     if (this.props.arr?.length) {
+      console.log("+")
       this.props.setPlayingStatus(
         // this.props.isPlayDone ||
         this.props.isSingleMode ? "" : "ended",
@@ -303,7 +304,7 @@ class Music extends React.PureComponent<Props, State> {
       }
       this.props.setShowPlaylistTracks(true)
     } else {
-      this.props.setPlayingStatus("ended", undefined)
+      this.props.setPlayingStatus("", undefined)
     }
   }
 
