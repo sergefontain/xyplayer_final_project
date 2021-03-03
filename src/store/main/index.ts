@@ -115,12 +115,12 @@ const mainReducer = (
     case getType(actions.prevPlaylistPage):
       return {
         ...state,
-        currentPlaylistPage: state.currentPlaylistPage - 1,
+        currentPlaylistPage: action.payload,
       }
     case getType(actions.nextPlaylistPage):
       return {
         ...state,
-        currentPlaylistPage: state.currentPlaylistPage + 1,
+        currentPlaylistPage: action.payload,
       }
     case getType(actions.setLimitOverloaded):
       return {

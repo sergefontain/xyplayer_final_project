@@ -667,13 +667,13 @@ export function* getTracksSaga(): SagaIterator {
 export function* getPrevPlaylistPageSaga(): SagaIterator {
   while (true) {
     try {
-      yield take(actions.prevPlaylistPage)
+      const {payload: currPstPage} = yield take(actions.prevPlaylistPage)
 
       if (pagesCount === 0 && queryNum !== 0) {
         queryNum = queryNum - 1
         pagesCount = queryMaxSize - 1
 
-        yield put(actions.prevPlaylistPage())
+        yield put(actions.prevPlaylistPage(currPstPage))
         yield put(actions.getPlaylistsReq())
 
         const checkTrue = yield call(checkLimitOverLoad)
@@ -698,7 +698,7 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
         pagesCount = pagesCount - 1
         maxSearchPagesCount = maxSearchPagesCount + 1
 
-        yield put(actions.prevPlaylistPage())
+        yield put(actions.prevPlaylistPage(currPstPage))
         yield put(actions.getPlaylistsReq())
 
         const authData = yield call(getToken)
@@ -881,7 +881,7 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
 export function* getNextPlaylistPageSaga(): SagaIterator {
   while (true) {
     try {
-      yield take(actions.nextPlaylistPage)
+      const {payload: currPstPage} = yield take(actions.nextPlaylistPage)
 
       const checkTrue = yield call(checkLimitOverLoad)
       if (checkTrue) {
@@ -1007,7 +1007,7 @@ export function* getNextPlaylistPageSaga(): SagaIterator {
         pagesCount = pagesCount + 1
         maxSearchPagesCount = maxSearchPagesCount - 1
 
-        yield put(actions.nextPlaylistPage())
+        yield put(actions.nextPlaylistPage(currPstPage))
         yield put(actions.getPlaylistsReq())
 
         const authData = yield call(getToken)

@@ -729,7 +729,7 @@ const GetPlaylists: React.FC<Props> = ({
                 queryStatus === "playlists_pending" ||
                 queryStatus === "tracks_pending"
               }
-              onClick={prevPlaylistPage}
+              onClick={() => prevPlaylistPage(currentPlaylistPage - 1)}
             >
               <div className="icon-arrow-left"></div>
             </Button>
@@ -825,7 +825,7 @@ const GetPlaylists: React.FC<Props> = ({
                       !!(playingStatus || savedPlayState) ||
                       queryStatus === "tracks_pending"
                     }
-                    onClick={nextPlaylistPage}
+                    onClick={() => nextPlaylistPage(currentPlaylistPage + 1)}
                     className="my-4 rounded"
                   >
                     <div className="icon-arrow-right"></div>

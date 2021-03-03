@@ -88,8 +88,8 @@ export const getPlaylistsTracksFail = createAction(
   "main/GET_PLAYLISTS_TRACKS_FAILURE"
 )<string>()
 
-export const prevPlaylistPage = createAction("main/PREV_PLAYLIST_PAGE")()
-export const nextPlaylistPage = createAction("main/NEXT_PLAYLIST_PAGE")()
+export const prevPlaylistPage = createAction("main/PREV_PLAYLIST_PAGE")<number>()
+export const nextPlaylistPage = createAction("main/NEXT_PLAYLIST_PAGE")<number>()
 export const setPlaylistPage = createAction("main/SET_PLAYLIST_PAGE")<number>()
 
 export const setPlaylistPageLength = createAction(
