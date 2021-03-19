@@ -635,6 +635,11 @@ export function* getTracksSaga(): SagaIterator {
         yield put(
           actions.getPlaylistOwnerId(playlistOne.PlaylistFindOne.owner._id)
         )
+        const checkTracksOverload = yield call(checkTrackPageLimitOverload)
+        if (checkTracksOverload) {
+          yield put(actions.setTrackPageLimitOverloaded(false))
+          localStorage.removeItem("trackPageLimitOverload")
+        }
 
         const modifiedTracksArrToFront = yield call(
           preparingTracksArrToFront,
