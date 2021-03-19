@@ -176,7 +176,7 @@ const applyPlaylistSortRule = (playlistArr: Array<Playlist>) => {
 }
 
 const preparingTracksArrToFront = (tracksArr: Array<Track>) => {
-  return Object.values(
+  let result: Array<Track> = Object.values(
     tracksArr.reduce(
       (sum, currentItem: { originalFileName?: Track["originalFileName"] }) =>
         Object.assign(sum, {
@@ -185,6 +185,12 @@ const preparingTracksArrToFront = (tracksArr: Array<Track>) => {
       {}
     )
   )
+
+  const filteredUrlNull = result.filter(
+    (x: { url?: Track["url"] }) => x.url !== null
+  )
+
+  return filteredUrlNull
 }
 
 const checkArrIncludesNextSlice = (
@@ -667,7 +673,7 @@ export function* getTracksSaga(): SagaIterator {
 export function* getPrevPlaylistPageSaga(): SagaIterator {
   while (true) {
     try {
-      const {payload: currPstPage} = yield take(actions.prevPlaylistPage)
+      const { payload: currPstPage } = yield take(actions.prevPlaylistPage)
 
       if (pagesCount === 0 && queryNum !== 0) {
         queryNum = queryNum - 1
@@ -881,7 +887,7 @@ export function* getPrevPlaylistPageSaga(): SagaIterator {
 export function* getNextPlaylistPageSaga(): SagaIterator {
   while (true) {
     try {
-      const {payload: currPstPage} = yield take(actions.nextPlaylistPage)
+      const { payload: currPstPage } = yield take(actions.nextPlaylistPage)
 
       const checkTrue = yield call(checkLimitOverLoad)
       if (checkTrue) {

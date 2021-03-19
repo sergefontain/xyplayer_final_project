@@ -36,10 +36,10 @@ export interface Playlist {
   tracks: Array<Track>
 }
 export interface Track {
-  [x:string]: string | User | ID3 | Array<Playlist> | undefined
-  originalFileName?: string | undefined
+  [x:string]: string | User | ID3 | Array<Playlist> | undefined | null
+  originalFileName?: string | undefined | null
   _id: string
-  url?: string | undefined
+  url?: string | undefined | null
   owner: User
   id3?: ID3 | undefined
   playlists: Array<Playlist>
